@@ -1,4 +1,13 @@
+import 'dart:io';
+//import 'dart:html' as html;
+
 import 'package:flutter/material.dart';
+
+//Image plugin
+import 'package:image_picker/image_picker.dart';
+
+//Firebase storage plugin
+import 'package:firebase_storage/firebase_storage.dart';
 
 void main() {
   runApp(MyApp());
@@ -51,8 +60,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  File coverImage;
+  final picker = ImagePicker();
 
-  void _uploadFile() {
+  Future _uploadFile() async {
+    final tempImage = await picker.getImage(source: ImageSource.gallery);
+
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -60,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       //_counter++;
+      coverImage = File(tempImage.path);
     });
   }
 
@@ -104,6 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),*/
+            coverImage == null? Text('Select an image'): enableUpload(),
           ],
         ),
       ),
@@ -112,6 +127,27 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Upload',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget enableUpload() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Image.file(coverImage, height: 300.0, width: 300.0),
+          RaisedButton(
+            elevation: 7.0,
+            child: Text('Upload'),
+            textColor: Colors.white,
+            color: Colors.pink,
+            onPressed: () {
+              final StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child('myimage.jpg');
+              final StorageUploadTask task = firebaseStorageRef.putFile(coverImage);
+            },
+          )
+      //final storageTaskSnapshot = await task.onComplete;
+        ],
+      ),
     );
   }
 }

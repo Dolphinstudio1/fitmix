@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "715149760424",
+    "firebase_url": "https://fitt-mix.firebaseio.com",
+    "project_id": "fitt-mix",
+    "storage_bucket": "fitt-mix.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715149760424:android:bf3081ca3847eed1e02f9d",
+        "android_client_info": {
+          "package_name": "hu.dolphinstudio.fittmix"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "715149760424-kb8as669oagf2di78fkvoosvj9vubk30.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hu.dolphinstudio.fittmix",
+            "certificate_hash": "b2d21354b222c7e929f2f2c155e23ae857eb47b2"
+          }
+        },
+        {
+          "client_id": "715149760424-j0t0ae2iakot3n97g0e46l34k4ht1rk3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDu6p8lMEwbhaUDyAnPUE983jUgkpi4Q9Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "715149760424-j0t0ae2iakot3n97g0e46l34k4ht1rk3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>715149760424-6s76p9ucm7g27mt559lsvbbjtb0bpr3s.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.715149760424-6s76p9ucm7g27mt559lsvbbjtb0bpr3s</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>715149760424-kb8as669oagf2di78fkvoosvj9vubk30.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAvIO-7cVcNcH5VbAT-oEsPjbMjgkw3W9w</string>
+	<key>GCM_SENDER_ID</key>
+	<string>715149760424</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>hu.dolphinstudio.fittmix</string>
+	<key>PROJECT_ID</key>
+	<string>fitt-mix</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fitt-mix.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:715149760424:ios:602a851e3d640e07e02f9d</string>
+	<key>DATABASE_URL</key>
+	<string>https://fitt-mix.firebaseio.com</string>
+</dict>
+</plist>
