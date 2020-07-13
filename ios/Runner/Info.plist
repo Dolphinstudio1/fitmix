@@ -42,10 +42,17 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string></string>
+	<string>Explain why your app uses photo library</string>
 	<key>NSCameraUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string></string>
+	<key>UIBackgroundModes</key>
+    <array>
+       <string>fetch</string>
+       <string>remote-notification</string>
+    </array>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Explain why your app uses music</string>
 </dict>
 </plist>
