@@ -13,6 +13,8 @@ import 'package:file_picker/file_picker.dart';
 //Firebase storage plugin
 import 'package:firebase_storage/firebase_storage.dart';
 
+import 'package:fittmix/imageviewer.dart';
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -42,7 +44,10 @@ class _MyHomePageState extends State<MyHomePage> {
   var musicFileName;
   final firebaseStorage = FirebaseStorage.instance;
   //StorageReference listRef = firebaseStorage.ref().child("files/uid");
-  //List<StorageUploadTask> _tasks = <StorageUploadTask>[];
+  List<StorageUploadTask> _tasks = <StorageUploadTask>[];
+  //var uploadCounter = 0;
+  StorageUploadTask imageUploadTask;
+  StorageUploadTask musicUploadTask;
 
   Future _uploadImageFile() async {
     //final tempImage = await picker.getImage(source: ImageSource.gallery);
@@ -91,15 +96,25 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    /*final List<Widget> children = <Widget>[];
-    _tasks.forEach((StorageUploadTask task) {
-      final Widget tile = UploadTaskListTile(
-        task: task,
-        onDismissed: () => setState(() => _tasks.remove(task)),
-        onDownload: () => _downloadFile(task.lastSnapshot.ref),
-      );
-      children.add(tile);
-    });*/
+    final List<Widget> children = <Widget>[
+      if (selectContantsFlag == false) Text('Choose a mix for upload') else selectContents(),
+
+      if (imageFile != null && musicFile != null) enableUpload() else Text(''),
+      //if (_tasks.length == uploadCounter) Text('Jeee')
+      ];
+
+    if (selectContantsFlag == false) _floatingActionButtonShow = true;
+
+      _tasks.forEach((StorageUploadTask task) {
+        final Widget tile = UploadTaskListTile(
+          task: task,
+          onDismissed: () => setState(() => _tasks.remove(task)),
+          //onDownload: () => _downloadFile(task.lastSnapshot.ref),
+          onComplete: () => setState(() => selectContantsFlag = false), //
+        );
+        if(selectContantsFlag == true)
+          children.add(tile);
+      });
 
     return Scaffold(
       appBar: AppBar(
@@ -126,20 +141,26 @@ class _MyHomePageState extends State<MyHomePage> {
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
+          children: children,
+          /*<Widget>[
+            ,
+            /*Expanded(
+                child: ListView(
+                  children: ,
+                )),*/
+            /*Text(
               '',
-            ),
+            ),*/
             /*Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),*/
 
-            if (selectContantsFlag == false) Text('Choose a mix for upload') else selectContents(),
+
             //imageFile == null? selectContents() : selectContents(), //enableUpload()
-            if(imageFile != null && musicFile != null) enableUpload() else Text(''),
+
             //var dowurl = await (await imageUploadTask.onComplete).firebaseStorageRefImage.getDownloadURL();
-          ],
+          ],*/
         ),
 
 
@@ -148,8 +169,35 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: Visibility(
         visible: _floatingActionButtonShow,
         child: FloatingActionButton(
-            tooltip: 'Upload', child: Icon(Icons.add), onPressed: selectContentsMethod)
+            tooltip: 'Upload',
+            child: Icon(Icons.add),
+            onPressed: selectContentsMethod)
       ), // This trailing comma makes auto-formatting nicer for build methods.
+      bottomNavigationBar: BottomAppBar(
+        child: new Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(
+                  Icons.cloud_upload
+              ),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(
+                  Icons.view_list
+              ),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ImageViewer())
+                );
+              },
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -187,32 +235,138 @@ class _MyHomePageState extends State<MyHomePage> {
             textColor: Colors.white,
             color: Colors.pink,
             onPressed: () {
-              final StorageReference firebaseStorageRefImage = firebaseStorage.ref().child(imageFileName);
-              final StorageReference firebaseStorageRefMusic = firebaseStorage.ref().child(musicFileName);
-              final StorageUploadTask imageUploadTask = firebaseStorageRefImage.putFile(imageFile);
-              final StorageUploadTask musicUploadTask = firebaseStorageRefMusic.putFile(musicFile);
+              _uploadFiles();
               setState(() {
-                selectContantsFlag = false;
+                _tasks.add(imageUploadTask);
+                _tasks.add(musicUploadTask);
                 imageFile = null;
                 musicFile = null;
-                _floatingActionButtonShow = true;
               });
             },
-          )
+          ),
           //final storageTaskSnapshot = await task.onComplete;
         ],
       ),
     );
   }
 
-  /*Future<String> uploadImage(var imageFile ) async {
-    StorageReference ref = storage.ref().child("/photo.jpg");
-    StorageUploadTask uploadTask = ref.putFile(imageFile);
+  Future _uploadFiles() async {
+    final StorageReference firebaseStorageRefImage = firebaseStorage.ref().child(imageFileName);
+    final StorageReference firebaseStorageRefMusic = firebaseStorage.ref().child(musicFileName);
+    imageUploadTask = firebaseStorageRefImage.putFile(imageFile);
+    musicUploadTask = firebaseStorageRefMusic.putFile(musicFile);
 
-    var dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
-    url = dowurl.toString();
+    var dowurl = await (await imageUploadTask.onComplete).ref.getDownloadURL();
+    var imageUrl = dowurl.toString();
+    print("Image URL is $imageUrl");
+    final StorageTaskSnapshot downloadUrl = (await musicUploadTask.onComplete);
+    final String musicUrl = (await downloadUrl.ref.getDownloadURL());
+    print("Music URL is $musicUrl");
 
-    return url;
-  }*/
+    //eturn url;
+  }
 
+}
+
+class UploadTaskListTile extends StatelessWidget {
+  const UploadTaskListTile(
+      {Key key, this.task, this.onDismissed, this.onDownload, this.onComplete})
+      : super(key: key);
+
+  final StorageUploadTask task;
+  final VoidCallback onDismissed;
+  final VoidCallback onDownload;
+  final VoidCallback onComplete;
+
+  String get status {
+    String result;
+    if (task.isComplete) {
+      if (task.isSuccessful) {
+        result = 'Complete';
+      } else if (task.isCanceled) {
+        result = 'Canceled';
+      } else {
+        result = 'Failed ERROR: ${task.lastSnapshot.error}';
+      }
+    } else if (task.isInProgress) {
+      result = 'Uploading';
+    } else if (task.isPaused) {
+      result = 'Paused';
+    }
+    return result;
+  }
+
+  String _bytesTransferred(StorageTaskSnapshot snapshot) {
+    return '${snapshot.bytesTransferred}/${snapshot.totalByteCount}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<StorageTaskEvent>(
+      stream: task.events,
+      builder: (BuildContext context,
+          AsyncSnapshot<StorageTaskEvent> asyncSnapshot) {
+        Widget subtitle;
+        if (asyncSnapshot.hasData) {
+          final StorageTaskEvent event = asyncSnapshot.data;
+          final StorageTaskSnapshot snapshot = event.snapshot;
+          subtitle = Text('$status: ${_bytesTransferred(snapshot)} bytes sent');
+        } else {
+          subtitle = const Text('Starting...');
+        }
+        return Dismissible(
+          key: Key(task.hashCode.toString()),
+          onDismissed: (_) => onDismissed(),
+          child: ListTile(
+            title: Text('Upload Task #${task.hashCode}'),
+            subtitle: subtitle,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Offstage(
+                  offstage: !task.isInProgress,
+                  child: IconButton(
+                    icon: const Icon(Icons.pause),
+                    onPressed: () => task.pause(),
+                  ),
+                ),
+                Offstage(
+                  offstage: !task.isPaused,
+                  child: IconButton(
+                    icon: const Icon(Icons.file_upload),
+                    onPressed: () => task.resume(),
+                  ),
+                ),
+                Offstage(
+                  offstage: task.isComplete,
+                  child: IconButton(
+                    icon: const Icon(Icons.cancel),
+                    onPressed: () => task.cancel(),
+                  ),
+                ),
+                Offstage(
+                  offstage: !(task.isComplete && task.isSuccessful),
+                  child: IconButton(
+                    icon: const Icon(Icons.file_download),
+                    onPressed: onDownload,
+                  ),
+                ),
+                Offstage(
+                  offstage: !(task.isComplete && task.isSuccessful),
+                  child: RaisedButton(
+                    elevation: 7.0,
+                    child: Text('Done'),
+                    textColor: Colors.white,
+                    color: Colors.pink,
+                    onPressed: onComplete
+                  ),
+
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
