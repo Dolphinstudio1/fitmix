@@ -45,9 +45,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final firebaseStorage = FirebaseStorage.instance;
   //StorageReference listRef = firebaseStorage.ref().child("files/uid");
   List<StorageUploadTask> _tasks = <StorageUploadTask>[];
-  //var uploadCounter = 0;
   StorageUploadTask imageUploadTask;
   StorageUploadTask musicUploadTask;
+  var uploadComplete = false;
 
   Future _uploadImageFile() async {
     //final tempImage = await picker.getImage(source: ImageSource.gallery);
@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<Widget> children = <Widget>[
       if (selectContantsFlag == false) Text('Choose a mix for upload') else selectContents(),
 
-      if (imageFile != null && musicFile != null) enableUpload() else Text(''),
+      //if (imageFile != null && musicFile != null) enableUpload() else Text(''),
       //if (_tasks.length == uploadCounter) Text('Jeee')
       ];
 
@@ -110,13 +110,14 @@ class _MyHomePageState extends State<MyHomePage> {
           task: task,
           onDismissed: () => setState(() => _tasks.remove(task)),
           //onDownload: () => _downloadFile(task.lastSnapshot.ref),
-          onComplete: () => setState(() => selectContantsFlag = false), //
+          //onComplete: () => setState(() => ), //
         );
         if(selectContantsFlag == true)
           children.add(tile);
       });
 
     return Scaffold(
+      //backgroundColor: Colors.blue,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -203,32 +204,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget selectContents() {
     return Container(
+      color: Colors.redAccent,
       child: Column(
         children: <Widget>[
         if(imageFile != null)
           Image.file(imageFile, height: 300.0, width: 300.0),
-        RaisedButton(
-          elevation: 7.0,
-          child: Text('Choose a cover image'),
-          textColor: Colors.white,
-          color: Colors.pink,
-          onPressed: _uploadImageFile
-        ),
-        RaisedButton(
-          elevation: 7.0,
-          child: Text('Choose a music file'),
-          textColor: Colors.white,
-          color: Colors.pink,
-          onPressed: _uploadMusicFile
-        )],
-      ),
-    );
-  }
-
-  Widget enableUpload() {
-    return Container(
-      child: Column(
-        children: <Widget>[
+        if(imageUploadTask == null)
+          RaisedButton(
+            elevation: 7.0,
+            child: Text('Choose a cover image'),
+            textColor: Colors.white,
+            color: Colors.pink,
+            onPressed: _uploadImageFile
+          ),
+        if(musicUploadTask == null)
+          RaisedButton(
+            elevation: 7.0,
+            child: Text('Choose a music file'),
+            textColor: Colors.white,
+            color: Colors.pink,
+            onPressed: _uploadMusicFile
+          ),
+        if (imageFile != null && musicFile != null)
           RaisedButton(
             elevation: 7.0,
             child: Text('Upload'),
@@ -244,8 +241,23 @@ class _MyHomePageState extends State<MyHomePage> {
               });
             },
           ),
-          //final storageTaskSnapshot = await task.onComplete;
-        ],
+        if(uploadComplete)
+          RaisedButton(
+              elevation: 7.0,
+              child: Text('Done'),
+              textColor: Colors.white,
+              color: Colors.pink,
+              onPressed:  () {
+                _uploadFiles();
+                setState(() {
+                  uploadComplete = false;
+                  selectContantsFlag = false;
+                  imageUploadTask = null;
+                  musicUploadTask = null;
+                  _tasks.clear();
+                });
+              }
+          )],
       ),
     );
   }
@@ -262,6 +274,11 @@ class _MyHomePageState extends State<MyHomePage> {
     final StorageTaskSnapshot downloadUrl = (await musicUploadTask.onComplete);
     final String musicUrl = (await downloadUrl.ref.getDownloadURL());
     print("Music URL is $musicUrl");
+
+    if(imageUploadTask.isSuccessful && musicUploadTask.isSuccessful)
+      setState(() {
+        uploadComplete = true;
+      });
 
     //eturn url;
   }
@@ -351,19 +368,11 @@ class UploadTaskListTile extends StatelessWidget {
                     onPressed: onDownload,
                   ),
                 ),
-                Offstage(
-                  offstage: !(task.isComplete && task.isSuccessful),
-                  child: RaisedButton(
-                    elevation: 7.0,
-                    child: Text('Done'),
-                    textColor: Colors.white,
-                    color: Colors.pink,
-                    onPressed: onComplete
-                  ),
-
-                ),
               ],
             ),
+          ),
+          background: Container(
+            color: Colors.greenAccent,
           ),
         );
       },
