@@ -15,6 +15,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:fittmix/imageviewer.dart';
 
+import 'package:audioplayer/audioplayer.dart';
+
+import 'media_player.dart';
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -48,6 +52,10 @@ class _MyHomePageState extends State<MyHomePage> {
   StorageUploadTask imageUploadTask;
   StorageUploadTask musicUploadTask;
   var uploadComplete = false;
+  String musicUrl;
+  var listResult;
+  final musicUrlTest = 'https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=b0331efb-f128-41f1-9327-44441b4ecc74';
+  var startPlayer = false;
 
   Future _uploadImageFile() async {
     //final tempImage = await picker.getImage(source: ImageSource.gallery);
@@ -97,6 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
 
     final List<Widget> children = <Widget>[
+
+      Text(listResult.toString()),
+      
       if (selectContantsFlag == false) Text('Choose a mix for upload') else selectContents(),
 
       //if (imageFile != null && musicFile != null) enableUpload() else Text(''),
@@ -115,6 +126,14 @@ class _MyHomePageState extends State<MyHomePage> {
         if(selectContantsFlag == true)
           children.add(tile);
       });
+
+      if(startPlayer) {
+        final Widget tile1 = AudioApp(musicUrl);
+        children.add(tile1);
+      }
+
+    //AudioPlayer audioPlugin = AudioPlayer();
+    //audioPlugin.play(musicUrl);
 
     return Scaffold(
       //backgroundColor: Colors.blue,
@@ -183,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
               icon: Icon(
                   Icons.cloud_upload
               ),
-              onPressed: () {},
+              onPressed: getFirebaseImageFolder,
             ),
             IconButton(
               icon: Icon(
@@ -200,6 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+    //home: AudioApp,
   }
 
   Widget selectContents() {
@@ -255,6 +275,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   imageUploadTask = null;
                   musicUploadTask = null;
                   _tasks.clear();
+                  getFirebaseImageFolder();
+                  startPlayer = true;
                 });
               }
           )],
@@ -272,7 +294,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var imageUrl = dowurl.toString();
     print("Image URL is $imageUrl");
     final StorageTaskSnapshot downloadUrl = (await musicUploadTask.onComplete);
-    final String musicUrl = (await downloadUrl.ref.getDownloadURL());
+    musicUrl = (await downloadUrl.ref.getDownloadURL());
     print("Music URL is $musicUrl");
 
     if(imageUploadTask.isSuccessful && musicUploadTask.isSuccessful)
@@ -281,6 +303,20 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
     //eturn url;
+  }
+
+  void getFirebaseImageFolder() {
+    final StorageReference storageRef =
+    FirebaseStorage.instance.ref().child('/'); //.child('Gallery').child('Images')
+    storageRef.listAll().then((result) {
+      //print("result is $result");
+      listResult = result;
+      //print(listResult);
+      print(listResult.values.toList()[2].values.toList()[0].values.toList());
+      print(listResult.values.toList()[2].values.toList()[0]);
+      print(listResult.values.toList()[2]);
+      print(listResult);
+    });
   }
 
 }

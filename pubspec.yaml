@@ -23,11 +23,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_storage:
+  #firebase_storage:
   image_picker:
   file_picker: 1.12.0
   file_picker_web: any
   uuid: 2.2.0
+  audioplayer: 0.8.1
+  audioplayer_web: 0.7.1
+  path_provider:
+  sheet_music: ^0.3.0
+
+  firebase_storage:
+    git:
+      url: https://github.com/danysz/flutterfire.git
+      ref: master
+      path: packages/firebase_storage
 
   #firestorage_demo:
     #git:
