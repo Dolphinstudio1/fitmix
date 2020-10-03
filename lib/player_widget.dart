@@ -183,10 +183,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               _Btn(txt: '+', onPressed: () => _bpmCalculator('+')),
             ], mainAxisAlignment: MainAxisAlignment.spaceEvenly),
           ]),
-          TextField(
+          /*TextField(
             decoration: InputDecoration(
                 border: InputBorder.none, hintText: 'Enter a search term'),
-          ),
+          ),*/
         ],
       ),
     );

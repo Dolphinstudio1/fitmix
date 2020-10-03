@@ -1,3 +1,4 @@
+import 'package:fittmix/paypal_login1.dart';
 import 'package:fittmix/player_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -15,6 +16,7 @@ import 'package:fittmix/imageviewer.dart';
 import 'mix_list.dart';
 import 'package:audioplayer/audioplayer.dart';
 import 'media_player.dart';
+import 'paypal_profile.dart';
 import 'select_contents.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
@@ -24,7 +26,15 @@ import 'upload.dart';
 import 'media_player_adv.dart';
 import 'media_player_custom.dart';
 
-void main() {
+// Import the firebase_core plugin
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'add_mix_to_database.dart';
+import 'paypal_login.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -74,6 +84,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // Set default `_initialized` and `_error` state to false
+  bool _initialized = false;
+  bool _error = false;
+
   final picker = ImagePicker();
   bool _floatingActionButtonShow = true;
   bool selectContantsFlag = false;
@@ -97,6 +111,30 @@ class _MyHomePageState extends State<MyHomePage> {
   final firebaseStorage = FirebaseStorage.instance;
   StorageUploadTask _imageUploadTask;
   StorageUploadTask _musicUploadTask;
+
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  // Define an async function to initialize FlutterFire
+  /*void initializeFlutterFire() async {
+    try {
+      // Wait for Firebase to initialize and set `_initialized` state to true
+      await Firebase.initializeApp();
+      setState(() {
+        _initialized = true;
+      });
+    } catch (e) {
+      // Set `_error` state to true if Firebase initialization fails
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initializeFlutterFire();
+    super.initState();
+  }*/
 
   void selectContentsMethod() {
     _floatingActionButtonShow = false;
@@ -189,20 +227,29 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
+    // Show error message if initialization failed
+    if (_error) {
+      //return SomethingWentWrong();
+    }
+
+    // Show a loader until FlutterFire is initialized
+    if (!_initialized) {
+      //return Loading();
+    }
+
     final List<Widget> children = <Widget>[
       //Text(listResult.toString()),
 
       if (selectContantsFlag == true)
         SelectContents(
-            _imageFile,
-            _musicFile,
-            _imageUploadTask,
-            _musicUploadTask,
-            _selectImageFile,
-            _selectMusicFile,
-            _uploadFiles,
-            _uploadComplete,
-            _uploadDone)
+          _imageFile,
+          _musicFile,
+          _imageUploadTask,
+          _musicUploadTask,
+          _selectImageFile,
+          _selectMusicFile,
+          _uploadFiles,
+        )
       else if (_uploadComplete)
         RaisedButton(
             elevation: 7.0,
@@ -212,6 +259,9 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: _uploadDone)
       else
         Text('Choose a mix for upload'),
+        //PaypalapploginWidget(),
+        //PaypalappwalletWidget(),
+        //PayPalLogin(),
 
       //if (imageFile != null && musicFile != null) enableUpload() else Text(''),
       //if (_tasks.length == uploadCounter) Text('Jeee')
@@ -240,6 +290,9 @@ class _MyHomePageState extends State<MyHomePage> {
         //final Widget tile1 =
         //children.add(tile1);
       });
+      children
+          .add(AddMix(1, _imageFileName, imageUrl, _musicFileName, musicUrl));
+      //children.add(PaypalapploginWidget);
     }
 
     //AudioPlayer audioPlugin = AudioPlayer();
@@ -308,8 +361,12 @@ class _MyHomePageState extends State<MyHomePage> {
             IconButton(
               icon: Icon(Icons.cloud_upload),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PlayerWidget(url: 'https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=5c29f319-fe84-4664-adbd-ed4a042f09c3'))); //ImageViewer()
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PlayerWidget(
+                            url:
+                                'https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=5c29f319-fe84-4664-adbd-ed4a042f09c3'))); //ImageViewer()
                 //getFirebaseImageFolder;
               },
             ),
@@ -327,7 +384,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //home: AudioApp,
   }
 
-  /*void getFirebaseImageFolder() {
+/*void getFirebaseImageFolder() {
     final StorageReference storageRef = FirebaseStorage.instance
         .ref()
         .child('/'); //.child('Gallery').child('Images')

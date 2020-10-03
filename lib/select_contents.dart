@@ -1,30 +1,25 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'main.dart';
 
 class SelectContents extends StatelessWidget {
   File _imageFile;
   File _musicFile;
   StorageUploadTask _imageUploadTask;
   StorageUploadTask _musicUploadTask;
-  Function _uploadImageFile;
-  Function _uploadMusicFile;
+  Function _selectImageFile;
+  Function _selectMusicFile;
   Function _uploadFiles;
-  bool _uploadComplete;
-  Function _uploadDone;
 
   SelectContents(
-      this._imageFile,
-      this._musicFile,
-      this._imageUploadTask,
-      this._musicUploadTask,
-      this._uploadImageFile,
-      this._uploadMusicFile,
-      this._uploadFiles,
-      this._uploadComplete,
-      this._uploadDone);
+    this._imageFile,
+    this._musicFile,
+    this._imageUploadTask,
+    this._musicUploadTask,
+    this._selectImageFile,
+    this._selectMusicFile,
+    this._uploadFiles,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +35,14 @@ class SelectContents extends StatelessWidget {
                 child: Text('Choose a cover image'),
                 textColor: Colors.white,
                 color: Colors.pink,
-                onPressed: _uploadImageFile),
+                onPressed: _selectImageFile),
           if (_musicUploadTask == null)
             RaisedButton(
                 elevation: 7.0,
                 child: Text('Choose a music file'),
                 textColor: Colors.white,
                 color: Colors.pink,
-                onPressed: _uploadMusicFile),
+                onPressed: _selectMusicFile),
           if (_imageFile != null && _musicFile != null)
             RaisedButton(
               elevation: 7.0,
