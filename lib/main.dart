@@ -1,3 +1,5 @@
+import 'package:fittmix/media_player_plandesk.dart';
+import 'package:fittmix/music_player_freebie.dart';
 import 'package:fittmix/paypal_login1.dart';
 import 'package:fittmix/player_widget.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ import 'package:fittmix/imageviewer.dart';
 import 'mix_list.dart';
 import 'package:audioplayer/audioplayer.dart';
 import 'media_player.dart';
+import 'music_player_freebie1.dart';
 import 'paypal_profile.dart';
 import 'select_contents.dart';
 import 'package:file_picker/file_picker.dart';
@@ -259,9 +262,20 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: _uploadDone)
       else
         Text('Choose a mix for upload'),
-        //PaypalapploginWidget(),
-        //PaypalappwalletWidget(),
-        //PayPalLogin(),
+      //PaypalapploginWidget(),
+      //PaypalappwalletWidget(),
+      //PayPalLogin(),
+      //MusicPlayerFreebie(),
+
+      RaisedButton(onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MediaPlayerPlan()));
+      }, child: Text('Designed'),),
+
+      RaisedButton(onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => PlayerWidget(url: musicUrl)));
+      }, child: Text('Default'),),
 
       //if (imageFile != null && musicFile != null) enableUpload() else Text(''),
       //if (_tasks.length == uploadCounter) Text('Jeee')
@@ -300,11 +314,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       //backgroundColor: Colors.blue,
-      appBar: AppBar(
+      /*appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-      ),
+      ),*/
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -353,7 +367,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Icon(Icons.add),
               onPressed: selectContentsMethod)),
       // This trailing comma makes auto-formatting nicer for build methods.
-      bottomNavigationBar: BottomAppBar(
+      /*bottomNavigationBar: BottomAppBar(
         child: new Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -379,7 +393,7 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ],
         ),
-      ),
+      ),*/
     );
     //home: AudioApp,
   }
