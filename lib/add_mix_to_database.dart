@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AddMix extends StatelessWidget {
+class AddMixDatabase extends StatelessWidget {
   final int groupNumber;
   final String imageName;
   final String imageUrl;
@@ -15,7 +15,7 @@ class AddMix extends StatelessWidget {
 
   final firestoreInstance = FirebaseFirestore.instance;
 
-  AddMix(this.groupNumber, this.imageName, this.imageUrl, this.mixName,
+  AddMixDatabase(this.groupNumber, this.imageName, this.imageUrl, this.mixName,
       this.mixUrl); //this.uploadDate
 
   @override
