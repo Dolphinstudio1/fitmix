@@ -46,6 +46,8 @@ class _State extends State<AddMix> {
   StorageUploadTask _musicUploadTask;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  int _value = 0;
+  String groupName;
 
   void selectContentsMethod() {
     _floatingActionButtonShow = false;
@@ -129,6 +131,23 @@ class _State extends State<AddMix> {
     });
   }
 
+  CollectionReference mixes = FirebaseFirestore.instance.collection('mixes');
+
+  Future<void> addMix() {
+    // Call the user's CollectionReference to add a new user
+    return mixes
+        .add({
+          'group_name': groupName,
+          'image_name': _imageFileName, // John Doe
+          'iamge_url': imageUrl, // Stokes and Sons
+          'mix_name': _musicFileName,
+          'mix_url': musicUrl,
+          //'upload_date': uploadDate // 42
+        })
+        .then((value) => print("Mix Added"))
+        .catchError((error) => print("Failed to add mix: $error"));
+  }
+
   @override
   Widget build(BuildContext context) {
     // Show error message if initialization failed
@@ -144,25 +163,6 @@ class _State extends State<AddMix> {
     final List<Widget> children = <Widget>[
       //Text(listResult.toString()),
 
-      if (selectContantsFlag == true)
-        SelectContents(
-          _imageFile,
-          _musicFile,
-          _imageUploadTask,
-          _musicUploadTask,
-          _selectImageFile,
-          _selectMusicFile,
-          _uploadFiles,
-        )
-      else if (_uploadComplete)
-        RaisedButton(
-            elevation: 7.0,
-            child: Text('Done'),
-            textColor: Colors.white,
-            color: Colors.pink,
-            onPressed: _uploadDone)
-      else
-        Text('Choose a mix for upload'),
       //PaypalapploginWidget(),
       //PaypalappwalletWidget(),
       //PayPalLogin(),
@@ -184,6 +184,45 @@ class _State extends State<AddMix> {
       //if (imageFile != null && musicFile != null) enableUpload() else Text(''),
       //if (_tasks.length == uploadCounter) Text('Jeee')
     ];
+
+    List<String> elements = ['Kangoo', 'Aerobic', 'Box', 'Yoga'];
+
+    if (selectContantsFlag == true) {
+      children.add(
+        new DropdownButton<int>(
+          value: _value,
+          items: <int>[0, 1, 2, 3].map((int value) {
+            return new DropdownMenuItem<int>(
+              value: value,
+              child: new Text(elements[value]),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _value = value;
+              groupName = elements[value];
+            });
+          },
+        ),
+      );
+      children.add(SelectContents(
+        _imageFile,
+        _musicFile,
+        _imageUploadTask,
+        _musicUploadTask,
+        _selectImageFile,
+        _selectMusicFile,
+        _uploadFiles,
+      ));
+    } else if (_uploadComplete)
+      children.add(RaisedButton(
+          elevation: 7.0,
+          child: Text('Done'),
+          textColor: Colors.white,
+          color: Colors.pink,
+          onPressed: _uploadDone));
+    else
+      children.add(Text('Choose a mix for upload'));
 
     if (selectContantsFlag == false) _floatingActionButtonShow = true;
 
@@ -208,10 +247,10 @@ class _State extends State<AddMix> {
         //final Widget tile1 =
         //children.add(tile1);
       });*/
-      children.add(AddMixDatabase(
-          1, _imageFileName, imageUrl, _musicFileName, musicUrl));
+      addMix();
+      //children.add(AddMixDatabase(groupName, _imageFileName, imageUrl, _musicFileName, musicUrl));
       //children.add(PaypalapploginWidget);
-      Navigator.pop(context);
+      //Navigator.pop(context);
     }
 
     //AudioPlayer audioPlugin = AudioPlayer();

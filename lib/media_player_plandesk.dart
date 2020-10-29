@@ -1,6 +1,7 @@
 import 'package:fittmix/addmix.dart';
 import 'package:flutter/material.dart';
 import 'media_player_designed.dart';
+import 'mix_list.dart';
 
 class MediaPlayerPlan extends StatelessWidget {
   var blueColor = Color(0xFF090e42);
@@ -64,11 +65,11 @@ class MediaPlayerPlan extends StatelessWidget {
             Row(
               children: <Widget>[
                 ItemCard(
-                    'assets/images/apple-music-note.jpg', 'Extremely loud'),
+                    'Kangoo','assets/images/kangoo.jpg', 'Kangoo'),
                 SizedBox(
                   width: 16.0,
                 ),
-                ItemCard('assets/images/Rectangle13.png', 'Extremely loud'),
+                ItemCard('Aerobic','assets/images/aerobic.jpeg', 'Aerobic'),
               ],
             ),
             SizedBox(
@@ -77,12 +78,12 @@ class MediaPlayerPlan extends StatelessWidget {
             Row(
               children: <Widget>[
                 ItemCard(
-                    'assets/images/apple-music-note.jpg', 'Extremely loud'),
+                    'Box','assets/images/box.jpeg', 'Box'),
                 SizedBox(
                   width: 16.0,
                 ),
                 ItemCard(
-                    'assets/images/apple-music-note.jpg', 'Extremely loud'),
+                    'Yoga','assets/images/yoga.jpeg', 'Yoga'),
               ],
             ),
             SizedBox(
@@ -196,10 +197,11 @@ class SongItem extends StatelessWidget {
 }
 
 class ItemCard extends StatelessWidget {
+  final groupName;
   final image;
   final title;
 
-  ItemCard(this.image, this.title);
+  ItemCard(this.groupName, this.image, this.title);
 
   @override
   Widget build(BuildContext context) {
@@ -208,29 +210,38 @@ class ItemCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            height: 120.0,
-            child: Stack(
-              children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Image.asset(
-                    image,
-                    fit: BoxFit.cover,
-                    height: 140,
-                    width: double.infinity,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MixList(groupName)));
+            },
+            child: Container(
+              height: 120.0,
+              child: Stack(
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.asset(
+                      image,
+                      fit: BoxFit.cover,
+                      height: 140,
+                      width: double.infinity,
+                    ),
                   ),
-                ),
-                Positioned(
-                  right: 16.0,
-                  top: 16.0,
-                  child: Icon(
-                    Icons.bookmark,
-                    color: Colors.white.withOpacity(0.6),
-                    size: 24.0,
-                  ),
-                )
-              ],
+                  Positioned(
+                    right: 16.0,
+                    top: 16.0,
+                    child: Icon(
+                      Icons.bookmark,
+                      color: Colors.white.withOpacity(0.6),
+                      size: 24.0,
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
           SizedBox(
