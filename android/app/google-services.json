@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:715149760424:android:bf3081ca3847eed1e02f9d",
+        "mobilesdk_app_id": "1:715149760424:android:7ab3c80e987879f7e02f9d",
         "android_client_info": {
-          "package_name": "hu.dolphinstudio.fittmix"
+          "package_name": "hu.dolphinstudio.fitmix"
         }
       },
       "oauth_client": [
         {
-          "client_id": "715149760424-kb8as669oagf2di78fkvoosvj9vubk30.apps.googleusercontent.com",
+          "client_id": "715149760424-qvcs9rc9abcm0o6ke5hm1tjqc1tkbemg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "hu.dolphinstudio.fittmix",
+            "package_name": "hu.dolphinstudio.fitmix",
             "certificate_hash": "b2d21354b222c7e929f2f2c155e23ae857eb47b2"
           }
         },
@@ -38,6 +38,13 @@
             {
               "client_id": "715149760424-j0t0ae2iakot3n97g0e46l34k4ht1rk3.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "715149760424-sa18ig3bkrn32lljtek126g5bru7sa12.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "hu.dolphinstudio.fitmix"
+              }
             }
           ]
         }

@@ -3,22 +3,30 @@ import 'package:flutter/material.dart';
 import 'media_player_designed.dart';
 import 'mix_list.dart';
 
-class MediaPlayerPlan extends StatelessWidget {
+class MediaPlayerPlan extends StatefulWidget {
+  final String musicUrl;
+
+  MediaPlayerPlan(this.musicUrl);
+
+  @override
+  _MediaPlayerPlanState createState() => _MediaPlayerPlanState();
+}
+
+class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
   var blueColor = Color(0xFF090e42);
+
   var pinkColor = Color(0xFFff6b80);
 
   var mm = '🎵';
 
   var flume =
       'https://i.scdn.co/image/8d84f7b313ca9bafcefcf37d4e59a8265c7d3fff';
+
   var martinGarrix =
       'https://c1.staticflickr.com/2/1841/44200429922_d0cbbf22ba_b.jpg';
+
   var rosieLowe =
       'https://i.scdn.co/image/db8382f6c33134111a26d4bf5a482a1caa5f151c';
-
-  String musicUrl;
-
-  MediaPlayerPlan(this.musicUrl);
 
   void settings() => null;
 
@@ -26,6 +34,22 @@ class MediaPlayerPlan extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: blueColor,
+      /*appBar: new AppBar(
+        actions: <Widget>[
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                child: Text("First"),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Text("Second"),
+              ),
+            ],
+          )
+        ],
+      ),*/
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
@@ -37,16 +61,54 @@ class MediaPlayerPlan extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 CustomTextField(),
-                IconButton(
+                PopupMenuButton<int>(
+                  icon: Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                  ),
+                  onSelected: (value) {
+                    switch (value) {
+                      case 1:
+                        break;
+                      case 2:
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddMix())); //musicUrl
+                        break;
+                      case 3:
+                        break;
+                      case 4:
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 1,
+                      child: Text("Profile"),
+                    ),
+                    PopupMenuItem(
+                      value: 2,
+                      child: Text("Add mix"),
+                    ),
+                    PopupMenuItem(
+                      value: 3,
+                      child: Text("Help"),
+                    ),
+                    PopupMenuItem(
+                      value: 4,
+                      child: Text("Log out"),
+                    ),
+                  ],
+                ),
+                /*IconButton(
                   icon: Icon(Icons.more_vert),
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddMix())); //musicUrl
+                    print("PopupMenu");
+
                   },
                   color: Colors.white,
-                ),
+                ),*/
               ],
             ),
             SizedBox(
@@ -64,12 +126,11 @@ class MediaPlayerPlan extends StatelessWidget {
             ),
             Row(
               children: <Widget>[
-                ItemCard(
-                    'Kangoo','assets/images/kangoo.jpg', 'Kangoo'),
+                ItemCard('Kangoo', 'assets/images/kangoo.jpg', 'Kangoo'),
                 SizedBox(
                   width: 16.0,
                 ),
-                ItemCard('Aerobic','assets/images/aerobic.jpeg', 'Aerobic'),
+                ItemCard('Aerobic', 'assets/images/aerobic.jpeg', 'Aerobic'),
               ],
             ),
             SizedBox(
@@ -77,13 +138,11 @@ class MediaPlayerPlan extends StatelessWidget {
             ),
             Row(
               children: <Widget>[
-                ItemCard(
-                    'Box','assets/images/box.jpeg', 'Box'),
+                ItemCard('Box', 'assets/images/box.jpeg', 'Box'),
                 SizedBox(
                   width: 16.0,
                 ),
-                ItemCard(
-                    'Yoga','assets/images/yoga.jpeg', 'Yoga'),
+                ItemCard('Yoga', 'assets/images/yoga.jpeg', 'Yoga'),
               ],
             ),
             SizedBox(
@@ -100,13 +159,13 @@ class MediaPlayerPlan extends StatelessWidget {
               height: 16.0,
             ),
             SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
-                musicUrl),
-            SongItem('Never be like you', 'Flume', flume, musicUrl),
-            SongItem('Worry bout us', 'Rosie Lowe', rosieLowe, musicUrl),
+                widget.musicUrl),
+            SongItem('Never be like you', 'Flume', flume, widget.musicUrl),
+            SongItem('Worry bout us', 'Rosie Lowe', rosieLowe, widget.musicUrl),
             SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
-                musicUrl),
+                widget.musicUrl),
             SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
-                musicUrl),
+                widget.musicUrl),
           ],
         ),
       ),
@@ -212,11 +271,8 @@ class ItemCard extends StatelessWidget {
         children: <Widget>[
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          MixList(groupName)));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MixList(groupName)));
             },
             child: Container(
               height: 120.0,
