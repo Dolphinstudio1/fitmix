@@ -1,6 +1,13 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
+import 'package:http/http.dart';
+import 'package:path_provider/path_provider.dart';
+
+typedef void OnError(Exception exception);
 
 enum PlayerState { stopped, playing, paused }
 enum PlayingRouteState { speakers, earpiece }
@@ -30,6 +37,10 @@ class _DetailedScreen extends State<DetailedScreen> {
   final image;
 
   AudioPlayer _audioPlayer;
+
+  String localFilePath;
+  bool isLocalFileExist = false;
+
   AudioPlayerState _audioPlayerState;
   Duration _duration;
   Duration _position;
@@ -67,7 +78,7 @@ class _DetailedScreen extends State<DetailedScreen> {
   void initState() {
     super.initState();
     _initAudioPlayer();
-    _play();
+    _checkLocalFile();
   }
 
   @override
@@ -80,6 +91,73 @@ class _DetailedScreen extends State<DetailedScreen> {
     _playerStateSubscription?.cancel();
     _playerControlCommandSubscription?.cancel();
     super.dispose();
+  }
+
+  _checkLocalFile() async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    /*String mp3Path = dir.toString();
+    print(mp3Path);
+    print(url);
+    List<FileSystemEntity> _files;
+    List<FileSystemEntity> _songs = [];
+    _files = dir.listSync(recursive: true, followLinks: false);
+    for (FileSystemEntity entity in _files) {
+      String path = entity.path;
+      print(title);
+      if (path.endsWith('$title.mp3')) _songs.add(entity);
+    }
+    print(_songs);
+    print(_songs.length);
+    if (_songs.length == 1) {
+      isLocalFileExist = true;
+      localFilePath = _songs[0].toString();
+      //final file = new File('${(await getTemporaryDirectory()).path}/$title.mp3');
+      //localFilePath = file.path;
+      print("Local "+localFilePath);
+    }*/
+
+    final file = File('${dir.path}/$title.mp3');
+    if (await file.exists()){
+      localFilePath = file.path;
+      print("Local "+localFilePath);
+      isLocalFileExist = true;
+    }
+
+    if (isLocalFileExist) {
+      _playLocal();
+    } else {
+      _play();
+    }
+  }
+
+  Future<Uint8List> _loadFileBytes(String url, {OnError onError}) async {
+    Uint8List bytes;
+    try {
+      bytes = await readBytes(url);
+    } on ClientException {
+      rethrow;
+    }
+    return bytes;
+  }
+
+  Future _loadFile() async {
+    final bytes = await _loadFileBytes(url,
+        onError: (Exception exception) =>
+            print('_loadFile => exception $exception')); //kUrl
+
+    final dir = await getApplicationDocumentsDirectory();
+    print(dir.path);
+    print(dir.parent);
+    final file = File('${dir.path}/$title.mp3');
+    print(file);
+
+    await file.writeAsBytes(bytes);
+    if (await file.exists())
+      setState(() {
+        localFilePath = file.path;
+        print("Downloaded "+localFilePath);
+        isLocalFileExist = true;
+      });
   }
 
   @override
@@ -126,13 +204,27 @@ class _DetailedScreen extends State<DetailedScreen> {
                               ),
                             ),
                             Container(
-                              decoration: BoxDecoration(
+                              /*decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(50.0)),
-                              child: Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.white,
-                              ),
+                                  borderRadius: BorderRadius.circular(50.0)),*/
+                              child: (isLocalFileExist)
+                                  ? IconButton(
+                                      icon: Icon(Icons.download_rounded),
+                                      //arrow_drop_down
+                                      color: Colors.white,
+                                      onPressed: () {
+                                        _loadFile();
+                                      },
+                                    )
+                                  : IconButton(
+                                      icon: Icon(Icons.download_outlined),
+                                      //arrow_drop_down
+                                      color: Colors.white,
+                                      onPressed: () {
+                                        print("Push _loadFile");
+                                        _loadFile();
+                                      },
+                                    ),
                             ),
                             Column(
                               children: <Widget>[
@@ -232,7 +324,13 @@ class _DetailedScreen extends State<DetailedScreen> {
                           icon: Icon(Icons.play_arrow),
                           iconSize: 40.0,
                           color: Colors.white,
-                          onPressed: _play,
+                          onPressed: () {
+                            if (isLocalFileExist) {
+                              _playLocal();
+                            } else {
+                              _play();
+                            }
+                          },
                         )
                       : IconButton(
                           icon: Icon(Icons.pause),
@@ -265,15 +363,15 @@ class _DetailedScreen extends State<DetailedScreen> {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(50.0)),*/
                   child: Padding(
-                    padding: const EdgeInsets.all(0.0),
-                    child: Text(
-                      bpm.toString(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 24),
-                    ),
-                  )),
+                padding: const EdgeInsets.all(0.0),
+                child: Text(
+                  bpm.toString(),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 24),
+                ),
+              )),
               IconButton(
                   icon: Icon(Icons.add),
                   color: pinkColor,
@@ -391,6 +489,11 @@ class _DetailedScreen extends State<DetailedScreen> {
     _audioPlayer.setPlaybackRate(playbackRate: playbackRate);
 
     return result;
+  }
+
+  Future _playLocal() async {
+    await _audioPlayer.play(localFilePath, isLocal: true);
+    setState(() => _playerState = PlayerState.playing);
   }
 
   Future<int> _pause() async {

@@ -150,7 +150,7 @@ class _MixListState extends State<MixList> {
                         itemBuilder: (context, index) {
                           //DocumentSnapshot data = querySnapshot.data[index];
                           return SongItem(
-                              list[index].get("mix_name"),
+                              list[index].get("mix_name").substring(0, list[index].get("mix_name").length-4),
                               'artist',
                               list[index].get("iamge_url"),
                               list[index].get("mix_url"));

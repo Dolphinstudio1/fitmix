@@ -110,8 +110,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    return MediaPlayerPlan(
-        'https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
+    return
+      //AudioApp('https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
+      //ExampleApp('https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
+      MediaPlayerPlan('https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
     /*Scaffold(
       //backgroundColor: Colors.blue,
       /*appBar: AppBar(
