@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>715149760424-6s76p9ucm7g27mt559lsvbbjtb0bpr3s.apps.googleusercontent.com</string>
+	<string>715149760424-sa18ig3bkrn32lljtek126g5bru7sa12.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.715149760424-6s76p9ucm7g27mt559lsvbbjtb0bpr3s</string>
+	<string>com.googleusercontent.apps.715149760424-sa18ig3bkrn32lljtek126g5bru7sa12</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>715149760424-kb8as669oagf2di78fkvoosvj9vubk30.apps.googleusercontent.com</string>
+	<string>715149760424-qvcs9rc9abcm0o6ke5hm1tjqc1tkbemg.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAvIO-7cVcNcH5VbAT-oEsPjbMjgkw3W9w</string>
 	<key>GCM_SENDER_ID</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>hu.dolphinstudio.fittmix</string>
+	<string>hu.dolphinstudio.fitmix</string>
 	<key>PROJECT_ID</key>
 	<string>fitt-mix</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:715149760424:ios:602a851e3d640e07e02f9d</string>
+	<string>1:715149760424:ios:48418b09e8646fdee02f9d</string>
 	<key>DATABASE_URL</key>
 	<string>https://fitt-mix.firebaseio.com</string>
 </dict>

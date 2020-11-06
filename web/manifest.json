@@ -1,6 +1,6 @@
 {
-    "name": "fittmix",
-    "short_name": "fittmix",
+    "name": "fitmix",
+    "short_name": "fitmix",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

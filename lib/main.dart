@@ -1,8 +1,6 @@
-import 'package:fittmix/login.dart';
-import 'package:fittmix/media_player_plandesk.dart';
-import 'package:fittmix/music_player_freebie.dart';
-import 'package:fittmix/paypal_login1.dart';
-import 'package:fittmix/player_widget.dart';
+import 'package:fitmix/login.dart';
+import 'package:fitmix/media_player_plandesk.dart';
+import 'package:fitmix/player_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -15,8 +13,6 @@ import 'package:flutter/scheduler.dart';
 
 import 'package:audioplayer/audioplayer.dart';
 import 'media_player.dart';
-import 'music_player_freebie1.dart';
-import 'paypal_profile.dart';
 
 import 'media_player_adv.dart';
 import 'media_player_custom.dart';
@@ -24,7 +20,6 @@ import 'media_player_custom.dart';
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
 import 'add_mix_to_database.dart';
-import 'paypal_login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

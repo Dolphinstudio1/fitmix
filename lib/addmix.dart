@@ -1,9 +1,9 @@
-import 'package:fittmix/add_mix_to_database.dart';
+import 'package:fitmix/add_mix_to_database.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:fittmix/imageviewer.dart';
+import 'package:fitmix/imageviewer.dart';
 import 'mix_list.dart';
 import 'select_contents.dart';
 import 'package:file_picker/file_picker.dart';

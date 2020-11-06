@@ -1,4 +1,4 @@
-import 'package:fittmix/addmix.dart';
+import 'package:fitmix/addmix.dart';
 import 'package:flutter/material.dart';
 import 'media_player_designed.dart';
 import 'mix_list.dart';

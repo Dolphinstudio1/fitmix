@@ -1,4 +1,4 @@
-# fittmix
+# fitmix
 
 A new Flutter application.
 

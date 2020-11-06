@@ -42,8 +42,8 @@ class _DetailedScreen extends State<DetailedScreen> {
   bool isLocalFileExist = false;
 
   AudioPlayerState _audioPlayerState;
-  Duration _duration;
-  Duration _position;
+  Duration _duration = Duration(seconds: 0);
+  Duration _position = Duration(seconds: 0);
 
   PlayerState _playerState = PlayerState.stopped;
   PlayingRouteState _playingRouteState = PlayingRouteState.speakers;
@@ -56,7 +56,7 @@ class _DetailedScreen extends State<DetailedScreen> {
 
   int defaultBpm = 126;
   int bpm = 126;
-  double playbackRate;
+  double playbackRate = 1.0;
 
   _DetailedScreen(this.url, this.title, this.artist, this.image);
 
@@ -64,7 +64,7 @@ class _DetailedScreen extends State<DetailedScreen> {
 
   get _isPaused => _playerState == PlayerState.paused;
 
-  get _durationText => _duration?.toString()?.split('.')?.first ?? '';
+  //get _durationText => _duration?.toString()?.split('.')?.first ?? '';
 
   get _positionText => _position?.toString()?.split('.')?.first ?? '';
 
@@ -411,7 +411,7 @@ class _DetailedScreen extends State<DetailedScreen> {
       setState(() => _duration = duration);
 
       // TODO implemented for iOS, waiting for android impl
-      if (Theme.of(context).platform == TargetPlatform.iOS) {
+      /*if (Theme.of(context).platform == TargetPlatform.iOS) {
         // (Optional) listen for notification updates in the background
         _audioPlayer.startHeadlessService();
 
@@ -428,7 +428,7 @@ class _DetailedScreen extends State<DetailedScreen> {
           hasNextTrack: true,
           hasPreviousTrack: false,
         );
-      }
+      }*/
     });
 
     _positionSubscription =
