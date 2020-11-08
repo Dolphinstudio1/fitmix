@@ -2,6 +2,7 @@ import 'package:fitmix/addmix.dart';
 import 'package:flutter/material.dart';
 import 'media_player_designed.dart';
 import 'mix_list.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MediaPlayerPlan extends StatefulWidget {
   final String musicUrl;
@@ -29,6 +30,10 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
       'https://i.scdn.co/image/db8382f6c33134111a26d4bf5a482a1caa5f151c';
 
   void settings() => null;
+
+  _signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +84,7 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                       case 3:
                         break;
                       case 4:
+                        _signOut();
                         break;
                     }
                   },

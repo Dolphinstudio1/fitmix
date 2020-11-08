@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitmix/login.dart';
 import 'package:fitmix/media_player_plandesk.dart';
 import 'package:fitmix/player_widget.dart';
@@ -23,7 +24,7 @@ import 'add_mix_to_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  //await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -97,6 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }*/
 
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -106,10 +109,50 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    return //Login();
+    return FutureBuilder(
+        future: _initialization,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasError) {
+            return Scaffold(
+              body: Center(
+                child: Text("Error: ${snapshot.error}"),
+              ),
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.done) {
+            return StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.connectionState == ConnectionState.active) {
+                  User user = snapshot.data;
+
+                  if (user == null) {
+                    return Login();
+                  } else {
+                    return MediaPlayerPlan(
+                        'https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
+                  }
+                }
+
+                return Scaffold(
+                  body: Center(
+                    child: Text("Checking Authentication"),
+                  ),
+                );
+              },
+            );
+          }
+
+          return Scaffold(
+            body: Center(
+              child: Text("Checking Authentication"),
+            ),
+          );
+        });
+
     //AudioApp('https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
     //ExampleApp('https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
-    MediaPlayerPlan('https://firebasestorage.googleapis.com/v0/b/fitt-mix.appspot.com/o/13443305_Money_EXTENDED_VERSION.mp3?alt=media&token=610463aa-f77b-47ae-8f78-07186ef45893');
     /*Scaffold(
       //backgroundColor: Colors.blue,
       /*appBar: AppBar(

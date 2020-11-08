@@ -1,7 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class Login extends StatelessWidget {
   var blueColor = Color(0xFF090e42);
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    // Create a new credential
+    final GoogleAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future<UserCredential> signInWithFacebook() async {
+    // Trigger the sign-in flow
+    final LoginResult result = await FacebookAuth.instance.login();
+
+    // Create a credential from the access token
+    final FacebookAuthCredential facebookAuthCredential =
+    FacebookAuthProvider.credential(result.accessToken.token);
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +85,10 @@ class Login extends StatelessWidget {
                             ],
                           ),
                         ),
-                        onTap: (){print("Clicked A");},
+                        onTap: () {
+                          signInWithGoogle();
+                          print("Clicked A");
+                        },
                       ),
                       SizedBox(
                         height: 24.0,
@@ -62,7 +98,7 @@ class Login extends StatelessWidget {
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius:
-                              BorderRadius.all(Radius.circular(20))),
+                                  BorderRadius.all(Radius.circular(20))),
                           child: Row(
                             children: <Widget>[
                               Stack(
@@ -95,7 +131,10 @@ class Login extends StatelessWidget {
                             ],
                           ),
                         ),
-                        onTap: (){print("Clicked B");},
+                        onTap: () {
+                          signInWithFacebook();
+                          print("Clicked B");
+                        },
                       ),
                     ])),
               ]),
