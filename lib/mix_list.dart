@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'mix_list_item.dart';
 import 'media_player_designed.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firestore_helper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'favorite.dart';
+import 'login.dart';
 
 class MixList extends StatefulWidget {
   String groupName;
@@ -38,11 +42,20 @@ class _MixListState extends State<MixList> {
       });*/
   }
 
-  /*@override
+  List<Favorite> favorites = [];
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    firestoreInstance
+
+    FirestoreHelper.getUserFavorites(Login.getUser().uid).then((data) {
+      setState(() {
+        favorites = data;
+      });
+    });
+
+    /*firestoreInstance
         .collection('mixes')
         .where('group_name', isEqualTo: groupName)
         /*.get().then((data) => print(data.docs[0].data()['mix_name'].toString()));*/
@@ -64,10 +77,10 @@ class _MixListState extends State<MixList> {
                 _mixListItems.add(SongItem(doc.get("mix_name"), 'Andris',
                     doc.get("iamge_url"), doc.get("mix_url")));
               })
-            });
+            });*/
     //print(groupName);
     print('mixListLenght1 - ' + _mixListItems.length.toString());
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,8 +147,10 @@ class _MixListState extends State<MixList> {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-                stream:
-                    FirebaseFirestore.instance.collection("mixes").where('group_name', isEqualTo: groupName).snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection("mixes")
+                    .where('group_name', isEqualTo: groupName)
+                    .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> querySnapshot) {
                   if (querySnapshot.hasError) return Text("Some error");
@@ -150,10 +165,13 @@ class _MixListState extends State<MixList> {
                         itemBuilder: (context, index) {
                           //DocumentSnapshot data = querySnapshot.data[index];
                           return SongItem(
-                              list[index].get("mix_name").substring(0, list[index].get("mix_name").length-4),
+                              list[index].id,
+                              list[index].get("mix_name").substring(
+                                  0, list[index].get("mix_name").length - 4),
                               'artist',
                               list[index].get("iamge_url"),
-                              list[index].get("mix_url"));
+                              list[index].get("mix_url"),
+                              favorites);
                         },
                         itemCount: list.length,
                       ),
@@ -167,29 +185,69 @@ class _MixListState extends State<MixList> {
   }
 }
 
-class SongItem extends StatelessWidget {
+class SongItem extends StatefulWidget {
+  final String mixId;
   final String title;
   final String artist;
   final String image;
   final String musicUrl;
+  List<Favorite> favorites;
 
-  SongItem(this.title, this.artist, this.image, this.musicUrl);
+  SongItem(this.mixId, this.title, this.artist, this.image, this.musicUrl,
+      this.favorites);
+
+  @override
+  _SongItemState createState() => _SongItemState();
+}
+
+class _SongItemState extends State<SongItem> {
+  bool isUserFavorite(String mixId) {
+    Favorite favorite = widget.favorites
+        .firstWhere((Favorite f) => (f.mixId == mixId), orElse: () => null);
+    if (favorite == null)
+      return false;
+    else
+      return true;
+  }
+
+  toggleFavorite(String mixId) async {
+    if (isUserFavorite(mixId)) {
+      Favorite favorite =
+          widget.favorites.firstWhere((Favorite f) => (f.mixId == mixId));
+      String favId = favorite.id;
+      await FirestoreHelper.deleteFavorite(favId);
+    } else {
+      await FirestoreHelper.addFavorite(mixId, Login.getUser().uid);
+    }
+    List<Favorite> updatedFavorites =
+        await FirestoreHelper.getUserFavorites(Login.getUser().uid);
+    setState(() {
+      widget.favorites = updatedFavorites;
+      print("Favorites - " + widget.favorites.toString());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    DetailedScreen(musicUrl, title, artist, image)));
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 26.0),
-        child: Row(
-          children: <Widget>[
-            Stack(
+    Color starColor =
+        (isUserFavorite(widget.mixId) ? Colors.amber : Colors.grey);
+    Icon starIcon = (isUserFavorite(widget.mixId)
+        ? Icon(Icons.star_outlined)
+        : Icon(Icons.star_border_outlined));
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: Row(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailedScreen(widget.musicUrl,
+                          widget.title, widget.artist, widget.image)));
+            },
+            child: Stack(
               children: <Widget>[
                 Container(
                   height: 80.0,
@@ -197,7 +255,7 @@ class SongItem extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.network(
-                      image,
+                      widget.image,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -210,42 +268,58 @@ class SongItem extends StatelessWidget {
                     color: Colors.white.withOpacity(0.7),
                     size: 42.0,
                   ),
-                )
+                ),
               ],
             ),
-            SizedBox(
-              width: 16.0,
+          ),
+          SizedBox(
+            width: 16.0,
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  widget.title,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0),
+                ),
+                SizedBox(
+                  height: 8.0,
+                ),
+                Text(
+                  widget.artist,
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.5), fontSize: 18.0),
+                ),
+              ],
             ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    title,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0),
-                  ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  Text(
-                    artist,
-                    style: TextStyle(
-                        color: Colors.white.withOpacity(0.5), fontSize: 18.0),
-                  ),
-                ],
+          ),
+          //Spacer(),
+          Column(
+            children: [
+              IconButton(
+                icon: starIcon,
+                color: Colors.white.withOpacity(0.6),
+                iconSize: 30.0,
+                onPressed: () {
+                  toggleFavorite(widget.mixId);
+                  print("MixId - " + widget.mixId);
+                },
               ),
-            ),
-            //Spacer(),
-            Icon(
-              Icons.more_horiz,
-              color: Colors.white.withOpacity(0.6),
-              size: 32.0,
-            ),
-          ],
-        ),
+              IconButton(
+                icon: Icon(Icons.download_outlined),
+                color: Colors.white.withOpacity(0.6),
+                iconSize: 30.0,
+                onPressed: () {
+                  //_loadFile();
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

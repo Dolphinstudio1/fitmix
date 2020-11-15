@@ -36,6 +36,12 @@ class Login extends StatelessWidget {
     return await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
   }
 
+  static User getUser() {
+    User user = FirebaseAuth.instance.currentUser;
+    print("UserID - " + user.uid);
+    return user;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
