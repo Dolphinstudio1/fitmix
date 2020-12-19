@@ -1,11 +1,7 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
-import 'package:http/http.dart';
-import 'package:path_provider/path_provider.dart';
+import 'localstore_helper.dart';
 
 typedef void OnError(Exception exception);
 
@@ -78,7 +74,21 @@ class _DetailedScreen extends State<DetailedScreen> {
   void initState() {
     super.initState();
     _initAudioPlayer();
-    _checkLocalFile();
+    selectPlayMethod();
+  }
+
+  void selectPlayMethod() {
+    LocalstoreHelper.checkLocalFile(title).then((value) {
+      if (value) {
+        LocalstoreHelper.getLocalFile(title).then((value) {
+          localFilePath = value;
+          isLocalFileExist = true;
+          _playLocal();
+        });
+      } else {
+        _play();
+      }
+    });
   }
 
   @override
@@ -93,75 +103,12 @@ class _DetailedScreen extends State<DetailedScreen> {
     super.dispose();
   }
 
-  _checkLocalFile() async {
-    Directory dir = await getApplicationDocumentsDirectory();
-    /*String mp3Path = dir.toString();
-    print(mp3Path);
-    print(url);
-    List<FileSystemEntity> _files;
-    List<FileSystemEntity> _songs = [];
-    _files = dir.listSync(recursive: true, followLinks: false);
-    for (FileSystemEntity entity in _files) {
-      String path = entity.path;
-      print(title);
-      if (path.endsWith('$title.mp3')) _songs.add(entity);
-    }
-    print(_songs);
-    print(_songs.length);
-    if (_songs.length == 1) {
-      isLocalFileExist = true;
-      localFilePath = _songs[0].toString();
-      //final file = new File('${(await getTemporaryDirectory()).path}/$title.mp3');
-      //localFilePath = file.path;
-      print("Local "+localFilePath);
-    }*/
-
-    final file = File('${dir.path}/$title.mp3');
-    if (await file.exists()){
-      localFilePath = file.path;
-      print("Local "+localFilePath);
-      isLocalFileExist = true;
-    }
-
-    if (isLocalFileExist) {
-      _playLocal();
-    } else {
-      _play();
-    }
-  }
-
-  Future<Uint8List> _loadFileBytes(String url, {OnError onError}) async {
-    Uint8List bytes;
-    try {
-      bytes = await readBytes(url);
-    } on ClientException {
-      rethrow;
-    }
-    return bytes;
-  }
-
-  Future _loadFile() async {
-    final bytes = await _loadFileBytes(url,
-        onError: (Exception exception) =>
-            print('_loadFile => exception $exception')); //kUrl
-
-    final dir = await getApplicationDocumentsDirectory();
-    print(dir.path);
-    print(dir.parent);
-    final file = File('${dir.path}/$title.mp3');
-    print(file);
-
-    await file.writeAsBytes(bytes);
-    if (await file.exists())
-      setState(() {
-        localFilePath = file.path;
-        print("Downloaded "+localFilePath);
-        isLocalFileExist = true;
-      });
-  }
-
   @override
   Widget build(BuildContext context) {
+    Icon arrowIcon = isLocalFileExist
+        ? Icon(Icons.download_rounded)
+        : Icon(Icons.download_outlined);
+
     return Scaffold(
       //appBar: AppBar(title: Text('')),
       backgroundColor: blueColor,
@@ -207,24 +154,22 @@ class _DetailedScreen extends State<DetailedScreen> {
                               /*decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(50.0)),*/
-                              child: (isLocalFileExist)
-                                  ? IconButton(
-                                      icon: Icon(Icons.download_rounded),
-                                      //arrow_drop_down
-                                      color: Colors.white,
-                                      onPressed: () {
-                                        _loadFile();
-                                      },
-                                    )
-                                  : IconButton(
-                                      icon: Icon(Icons.download_outlined),
-                                      //arrow_drop_down
-                                      color: Colors.white,
-                                      onPressed: () {
-                                        print("Push _loadFile");
-                                        _loadFile();
-                                      },
-                                    ),
+                              child: IconButton(
+                                icon: arrowIcon,
+                                //arrow_drop_down
+                                color: Colors.white,
+                                onPressed: () {
+                                  if (!isLocalFileExist) {
+                                    print("Push _loadFile");
+                                    LocalstoreHelper.loadFile(url, title)
+                                        .then((value) => setState(() {
+                                              localFilePath = value;
+                                              isLocalFileExist = true;
+                                              print("Local - " + localFilePath);
+                                            }));
+                                  }
+                                },
+                              ),
                             ),
                             Column(
                               children: <Widget>[
@@ -325,11 +270,7 @@ class _DetailedScreen extends State<DetailedScreen> {
                           iconSize: 40.0,
                           color: Colors.white,
                           onPressed: () {
-                            if (isLocalFileExist) {
-                              _playLocal();
-                            } else {
-                              _play();
-                            }
+                            selectPlayMethod();
                           },
                         )
                       : IconButton(

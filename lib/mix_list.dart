@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'mix_list_item.dart';
 import 'media_player_designed.dart';
@@ -7,31 +8,35 @@ import 'firestore_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'favorite.dart';
 import 'login.dart';
+import 'localstore_helper.dart';
+import 'media_player_plandesk.dart' as plandesk;
 
 class MixList extends StatefulWidget {
-  String groupName;
+  final String groupName;
+
+  const MixList(this.groupName, {Key key}) : super(key: key);
 
   @override
-  _MixListState createState() => _MixListState(groupName);
-
-  MixList(this.groupName);
+  _MixListState createState() => _MixListState();
 }
 
 class _MixListState extends State<MixList> {
-  final groupName;
+  //final groupName;
   var blueColor = Color(0xFF090e42);
-  final List<SongItem> _mixListItems = <SongItem>[];
+  List<SongItem> _mixListItems = <SongItem>[];
 
   //var mixElements = ['Mix1', 'Mix2'];
   final firestoreInstance = FirebaseFirestore.instance;
 
-  _MixListState(this.groupName) {
+  //final GlobalKey<_MixListState> _myKey = GlobalKey();
+
+  /*_MixListState(this.groupName) {
     /*mixElements.forEach((element) {
       _mixListItems.add(MixListItem(element, imageUrl));
     });*/
 
     //setState(() {});
-  }
+  }*/
 
   void _queryDocs() async {
     //var firebaseUser = await FirebaseAuth.instance.currentUser();
@@ -44,17 +49,13 @@ class _MixListState extends State<MixList> {
 
   List<Favorite> favorites = [];
 
+  //List<SongItem> favoriteMixes = [];
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    FirestoreHelper.getUserFavorites(Login.getUser().uid).then((data) {
-      setState(() {
-        favorites = data;
-      });
-    });
-
+    getFavoriteList();
     /*firestoreInstance
         .collection('mixes')
         .where('group_name', isEqualTo: groupName)
@@ -82,16 +83,71 @@ class _MixListState extends State<MixList> {
     print('mixListLenght1 - ' + _mixListItems.length.toString());
   }
 
+  void getFavoriteList() {
+    FirestoreHelper.getUserFavorites(Login.getUser().uid).then((data) {
+      setState(() {
+        favorites = data;
+        if (widget.groupName == "Favorites") {
+          fetchAllMixes(membersIDS: favorites).then((value) {
+            setState(() {
+              _mixListItems = value;
+            });
+          });
+        }
+      });
+    });
+  }
+
+  var ref = FirebaseFirestore.instance.collection('mixes');
+
+  List<dynamic> membersIDS = [
+    "0tDoh4xSSAQ9kK8ljytc",
+    "0wp3YJys36rPHCAvrgXV",
+    "73oviVSRdHIys3AlWj5j",
+    "vrWaSt1lj1JeiirWQAae"
+  ];
+
+  /// Fetch members list
+  Future<List<SongItem>> fetchAllMixes({List<Favorite> membersIDS}) async {
+    /*/// With whereIn
+    var result = await ref.where('uid', whereIn: membersIDS).get();
+    print(result.docs);
+    //var documents = result.docs.map((doc) => User.fromMap(doc.data, doc.id)).toList();
+    //return documents;*/
+
+    /// With loop
+    List<SongItem> results = [];
+    for (Favorite userID in membersIDS) {
+      print(userID.mixId);
+      await ref.doc(userID.mixId).get().then((result) {
+        //print(result.data());
+        results.add(SongItem(
+            result.id,
+            result.get("mix_name"),
+            'artist',
+            result.get("iamge_url"),
+            result.get("mix_url"),
+            widget.groupName,
+            favorites,
+            //refreshCallback: () {getFavoriteList()}
+            clickCallback: getFavoriteList));
+      });
+    }
+    //print(results);
+    return results;
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> children = <Widget>[];
+    //final child = KeyedSubtree(key: _myKey, child: widget.child);
 
     //print(groupName);
     //print('mixListLenght2 - ' + _mixListItems.length.toString());
 
-    _mixListItems.forEach((SongItem mixListItem) {
+    /*_mixListItems.forEach((SongItem mixListItem) {
       children.add(mixListItem);
-    });
+    });*/
 
     //children.add(SongItem('title', 'artist', 'image', 'musicUrl'));
 
@@ -135,6 +191,7 @@ class _MixListState extends State<MixList> {
                 IconButton(
                   icon: Icon(Icons.more_vert),
                   onPressed: () {
+                    print(FieldPath.documentId);
                     /*Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -146,11 +203,19 @@ class _MixListState extends State<MixList> {
             ),
           ),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection("mixes")
-                    .where('group_name', isEqualTo: groupName)
-                    .snapshots(),
+            child: (widget.groupName == 'Favorites')
+                ?
+                //print(favoriteMixes.length);
+                ListView.builder(
+                    itemCount: _mixListItems.length,
+                    itemBuilder: (BuildContext ctxt, int index) {
+                      return _mixListItems[index];
+                    })
+                /*StreamBuilder<QuerySnapshot>(stream: FirebaseFirestore.instance
+                .collection("mixes")//.get()
+                //.doc(),
+                .where(FieldPath.documentId, whereIn: [])
+                .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> querySnapshot) {
                   if (querySnapshot.hasError) return Text("Some error");
@@ -177,7 +242,40 @@ class _MixListState extends State<MixList> {
                       ),
                     );
                   }
-                }),
+                })*/
+                : StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("mixes")
+                        .where('group_name', isEqualTo: widget.groupName)
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> querySnapshot) {
+                      if (querySnapshot.hasError) return Text("Some error");
+                      if (querySnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else {
+                        final list = querySnapshot.data.docs;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              //DocumentSnapshot data = querySnapshot.data[index];
+                              return SongItem(
+                                  list[index].id,
+                                  list[index].get("mix_name").substring(0,
+                                      list[index].get("mix_name").length - 4),
+                                  'artist',
+                                  list[index].get("iamge_url"),
+                                  list[index].get("mix_url"),
+                                  widget.groupName,
+                                  favorites);
+                            },
+                            itemCount: list.length,
+                          ),
+                        );
+                      }
+                    }),
           ),
         ],
       ),
@@ -191,16 +289,49 @@ class SongItem extends StatefulWidget {
   final String artist;
   final String image;
   final String musicUrl;
+  final String groupName;
   List<Favorite> favorites;
 
-  SongItem(this.mixId, this.title, this.artist, this.image, this.musicUrl,
-      this.favorites);
+  //final RefreshCallback refreshCallback;
+  final VoidCallback clickCallback;
+
+  SongItem(
+      this.mixId,
+      this.title,
+      this.artist,
+      this.image,
+      this.musicUrl,
+      this.groupName,
+      this.favorites,
+      //{this.refreshCallback}
+      {this.clickCallback});
 
   @override
   _SongItemState createState() => _SongItemState();
 }
 
 class _SongItemState extends State<SongItem> {
+  String localFilePath;
+  bool isLocalFileExist = false;
+
+  //RefreshCallback refreshCallback;
+
+  @override
+  void initState() {
+    super.initState();
+    LocalstoreHelper.checkLocalFile(widget.title).then((value) {
+      if (value) {
+        LocalstoreHelper.getLocalFile(widget.title).then((value) {
+          setState(() {
+            localFilePath = value;
+            isLocalFileExist = true;
+          });
+        });
+      }
+    });
+    //refreshCallback = widget.refreshCallback;
+  }
+
   bool isUserFavorite(String mixId) {
     Favorite favorite = widget.favorites
         .firstWhere((Favorite f) => (f.mixId == mixId), orElse: () => null);
@@ -225,6 +356,8 @@ class _SongItemState extends State<SongItem> {
       widget.favorites = updatedFavorites;
       print("Favorites - " + widget.favorites.toString());
     });
+    //refreshCallback();
+    widget.clickCallback();
   }
 
   @override
@@ -234,6 +367,9 @@ class _SongItemState extends State<SongItem> {
     Icon starIcon = (isUserFavorite(widget.mixId)
         ? Icon(Icons.star_outlined)
         : Icon(Icons.star_border_outlined));
+    Icon arrowIcon = isLocalFileExist
+        ? Icon(Icons.download_rounded)
+        : Icon(Icons.download_outlined);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
@@ -305,16 +441,54 @@ class _SongItemState extends State<SongItem> {
                 color: Colors.white.withOpacity(0.6),
                 iconSize: 30.0,
                 onPressed: () {
-                  toggleFavorite(widget.mixId);
-                  print("MixId - " + widget.mixId);
+                  if (widget.groupName == "Favorites" &&
+                      isUserFavorite(widget.mixId)) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => CupertinoAlertDialog(
+                        title: Text(widget.title),
+                        content: Text("Töröljük a kedvencekből?"),
+                        actions: [
+                          CupertinoDialogAction(
+                            child: Text("Mégsem"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          CupertinoDialogAction(
+                            isDefaultAction: true,
+                            child: Text("Törlés"),
+                            onPressed: () {
+                              toggleFavorite(widget.mixId);
+                              //plandesk.ItemCardFavorite;
+                              /*Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => MixList('Favorites')));*/
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    toggleFavorite(widget.mixId);
+                    print("MixId - " + widget.mixId);
+                  }
                 },
               ),
               IconButton(
-                icon: Icon(Icons.download_outlined),
+                icon: arrowIcon,
                 color: Colors.white.withOpacity(0.6),
                 iconSize: 30.0,
                 onPressed: () {
-                  //_loadFile();
+                  if (!isLocalFileExist) {
+                    print("Push _loadFile");
+                    LocalstoreHelper.loadFile(widget.musicUrl, widget.title)
+                        .then((value) => setState(() {
+                              localFilePath = value;
+                              isLocalFileExist = true;
+                              print("Local - " + localFilePath);
+                            }));
+                  }
                 },
               ),
             ],
@@ -324,3 +498,5 @@ class _SongItemState extends State<SongItem> {
     );
   }
 }
+
+//typedef RefreshCallback = void Function();

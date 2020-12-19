@@ -273,11 +273,13 @@ class ItemCardFavorite extends StatelessWidget {
   final groupName;
   final image;
   final title;
+  MixList mixList;
 
   ItemCardFavorite(this.groupName, this.image, this.title);
 
   @override
   Widget build(BuildContext context) {
+    mixList = new MixList(groupName);
     return Expanded(
       flex: 1,
       child: Column(
@@ -286,7 +288,7 @@ class ItemCardFavorite extends StatelessWidget {
           GestureDetector(
             onTap: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MixList(groupName)));
+                  MaterialPageRoute(builder: (context) => mixList));
             },
             child: Container(
               height: 60.0,
