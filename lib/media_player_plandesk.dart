@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitmix/addmix.dart';
 import 'package:flutter/material.dart';
 import 'media_player_designed.dart';
 import 'mix_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitmix/login.dart';
 
 class MediaPlayerPlan extends StatefulWidget {
   final String musicUrl;
@@ -15,19 +17,17 @@ class MediaPlayerPlan extends StatefulWidget {
 
 class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
   var blueColor = Color(0xFF090e42);
-
   var pinkColor = Color(0xFFff6b80);
 
   var mm = '🎵';
-
   var flume =
       'https://i.scdn.co/image/8d84f7b313ca9bafcefcf37d4e59a8265c7d3fff';
-
   var martinGarrix =
       'https://c1.staticflickr.com/2/1841/44200429922_d0cbbf22ba_b.jpg';
-
   var rosieLowe =
       'https://i.scdn.co/image/db8382f6c33134111a26d4bf5a482a1caa5f151c';
+
+  static var adminUser = false;
 
   void settings() => null;
 
@@ -36,10 +36,42 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    /*FirebaseFirestore.instance
+        .collection('users')
+        .where('admins', arrayContainsAny: []).get()
+    .then((querySnapshot));*/
+    FirebaseFirestore.instance.collection("users").get().then((querySnapshot) {
+      querySnapshot.docs.forEach((element) {
+        List value = element.data()["admins"];
+        print(value);
+        for (final i in value) {
+          if (i == Login.getUser().uid) {
+            setState(() {
+              adminUser = true;
+            });
+            print(adminUser);
+          } else {
+            setState(() {
+              adminUser = false;
+            });
+          }
+        }
+        /*Firestore.instance.collection("items").document(value[0]).get().then((value){
+          print(value.data);
+        });*/
+      });
+    });
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: blueColor,
-      /*appBar: new AppBar(
+        backgroundColor: blueColor,
+        /*appBar: new AppBar(
         actions: <Widget>[
           PopupMenuButton<int>(
             itemBuilder: (context) => [
@@ -55,59 +87,192 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
           )
         ],
       ),*/
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: ListView(
-          children: <Widget>[
-            SizedBox(
-              height: 32.0,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                CustomTextField(),
-                PopupMenuButton<int>(
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: Colors.white,
-                  ),
-                  onSelected: (value) {
-                    switch (value) {
-                      case 1:
-                        break;
-                      case 2:
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddMix())); //musicUrl
-                        break;
-                      case 3:
-                        break;
-                      case 4:
-                        _signOut();
-                        break;
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 1,
-                      child: Text("Profile"),
-                    ),
-                    PopupMenuItem(
-                      value: 2,
-                      child: Text("Add mix"),
-                    ),
-                    PopupMenuItem(
-                      value: 3,
-                      child: Text("Help"),
-                    ),
-                    PopupMenuItem(
-                      value: 4,
-                      child: Text("Log out"),
-                    ),
-                  ],
+        endDrawer: adminUser
+            ? ClipRRect(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(20)),
+                child: Container(
+                  width: 150,
+                  child: new Drawer(
+                      child: new ListView(
+                    children: <Widget>[
+                      Container(
+                        color: blueColor,
+                        child: new DrawerHeader(
+                          child: new Text(
+                            'Profile',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                      ),
+                      new ListTile(
+                        title: new Text(
+                          'Add mix',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AddMix()));
+                        },
+                      ),
+                      new ListTile(
+                        title: new Text(
+                          'Help',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onTap: () {},
+                      ),
+                      //new Divider(),
+                      new ListTile(
+                        title: new Text(
+                          'Log out',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onTap: () {
+                          _signOut();
+                        },
+                      ),
+                    ],
+                  )),
                 ),
-                /*IconButton(
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(20)),
+                child: Container(
+                  width: 150,
+                  child: new Drawer(
+                      child: new ListView(
+                    children: <Widget>[
+                      Container(
+                        color: blueColor,
+                        child: new DrawerHeader(
+                          child: new Text(
+                            'Profile',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ),
+                      ),
+                      new ListTile(
+                        title: new Text(
+                          'Help',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onTap: () {},
+                      ),
+                      //new Divider(),
+                      new ListTile(
+                        title: new Text(
+                          'Log out',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onTap: () {
+                          _signOut();
+                        },
+                      ),
+                    ],
+                  )),
+                ),
+              ),
+        body: Builder(
+          builder: (context) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ListView(
+              children: <Widget>[
+                SizedBox(
+                  height: 32.0,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    CustomTextField(),
+                    //adminUser
+                    //?
+                    IconButton(
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: Colors.white,
+                      ),
+                      onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    )
+                    /*PopupMenuButton<int>(
+                        icon: Icon(
+                          Icons.more_vert,
+                          color: Colors.white,
+                        ),
+                        onSelected: (value) {
+                          switch (value) {
+                            case 1:
+                              break;
+                            case 2:
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddMix())); //musicUrl
+                              break;
+                            case 3:
+                              break;
+                            case 4:
+                              _signOut();
+                              break;
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 1,
+                            child: Text("Profile"),
+                          ),
+                          PopupMenuItem(
+                            value: 2,
+                            child: Text("Add mix"),
+                          ),
+                          PopupMenuItem(
+                            value: 3,
+                            child: Text("Help"),
+                          ),
+                          PopupMenuItem(
+                            value: 4,
+                            child: Text("Log out"),
+                          ),
+                        ],
+                      )*/
+                    /*: PopupMenuButton<int>(
+                            icon: Icon(
+                              Icons.more_vert,
+                              color: Colors.white,
+                            ),
+                            onSelected: (value) {
+                              switch (value) {
+                                case 1:
+                                  break;
+                                case 2:
+                                  break;
+                                case 3:
+                                  _signOut();
+                                  break;
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: 1,
+                                child: Text("Profile"),
+                              ),
+                              PopupMenuItem(
+                                value: 2,
+                                child: Text("Help"),
+                              ),
+                              PopupMenuItem(
+                                value: 3,
+                                child: Text("Log out"),
+                              ),
+                            ],
+                          ),*/
+                    /*IconButton(
                   icon: Icon(Icons.more_vert),
                   onPressed: () {
                     print("PopupMenu");
@@ -115,75 +280,78 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                   },
                   color: Colors.white,
                 ),*/
-              ],
-            ),
-            SizedBox(
-              height: 32.0,
-            ),
-            Text(
-              'Collections',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 38.0),
-            ),
-            SizedBox(
-              height: 16.0,
-            ),
-            Row(
-              children: <Widget>[
-                ItemCardFavorite('Favorites', 'assets/images/favorites.png', 'Favorites'),
-              ],
-            ),
-            SizedBox(
-              height: 16.0,
-            ),
-            Row(
-              children: <Widget>[
-                ItemCard('Kangoo', 'assets/images/kangoo.jpg', 'Kangoo'),
-                SizedBox(
-                  width: 16.0,
+                  ],
                 ),
-                ItemCard('Aerobic', 'assets/images/aerobic.jpeg', 'Aerobic'),
-              ],
-            ),
-            SizedBox(
-              height: 32.0,
-            ),
-            Row(
-              children: <Widget>[
-                ItemCard('Box', 'assets/images/box.jpeg', 'Box'),
                 SizedBox(
-                  width: 16.0,
+                  height: 32.0,
                 ),
-                ItemCard('Yoga', 'assets/images/yoga.jpeg', 'Yoga'),
+                Text(
+                  'Collections',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 38.0),
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+                Row(
+                  children: <Widget>[
+                    ItemCardFavorite('Favorites', 'assets/images/favorites.png',
+                        'Favorites'),
+                  ],
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+                Row(
+                  children: <Widget>[
+                    ItemCard('Kangoo', 'assets/images/kangoo.jpg', 'Kangoo'),
+                    SizedBox(
+                      width: 16.0,
+                    ),
+                    ItemCard(
+                        'Aerobic', 'assets/images/aerobic.jpeg', 'Aerobic'),
+                  ],
+                ),
+                SizedBox(
+                  height: 32.0,
+                ),
+                Row(
+                  children: <Widget>[
+                    ItemCard('Box', 'assets/images/box.jpeg', 'Box'),
+                    SizedBox(
+                      width: 16.0,
+                    ),
+                    ItemCard('Yoga', 'assets/images/yoga.jpeg', 'Yoga'),
+                  ],
+                ),
+                SizedBox(
+                  height: 32.0,
+                ),
+                Text(
+                  'Recommend',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 38.0),
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+                SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
+                    widget.musicUrl),
+                SongItem('Never be like you', 'Flume', flume, widget.musicUrl),
+                SongItem(
+                    'Worry bout us', 'Rosie Lowe', rosieLowe, widget.musicUrl),
+                SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
+                    widget.musicUrl),
+                SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
+                    widget.musicUrl),
               ],
             ),
-            SizedBox(
-              height: 32.0,
-            ),
-            Text(
-              'Recommend',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 38.0),
-            ),
-            SizedBox(
-              height: 16.0,
-            ),
-            SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
-                widget.musicUrl),
-            SongItem('Never be like you', 'Flume', flume, widget.musicUrl),
-            SongItem('Worry bout us', 'Rosie Lowe', rosieLowe, widget.musicUrl),
-            SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
-                widget.musicUrl),
-            SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
-                widget.musicUrl),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }
 
@@ -287,8 +455,8 @@ class ItemCardFavorite extends StatelessWidget {
         children: <Widget>[
           GestureDetector(
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => mixList));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => mixList));
             },
             child: Container(
               height: 60.0,

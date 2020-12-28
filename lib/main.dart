@@ -90,15 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
         _error = true;
       });
     }
-  }
-
-  @override
-  void initState() {
-    initializeFlutterFire();
-    super.initState();
   }*/
 
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  /*@override
+  void initState() {
+    //initializeFlutterFire();
+    super.initState();
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
 
     return FutureBuilder(
-        future: _initialization,
+        future: Firebase.initializeApp(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasError) {
             return Scaffold(
