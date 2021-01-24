@@ -67,4 +67,19 @@ class LocalstoreHelper {
     await file.writeAsBytes(bytes);
     return file.path;
   }
+
+  static Future<void> deleteFile(String filePath) async {
+    try {
+      print(filePath);
+      var file = File(filePath);
+
+      if (await file.exists()) {
+        // file exits, it is safe to call delete on it
+        await file.delete();
+      }
+
+    } catch (e) {
+      // error in getting access to the file
+    }
+  }
 }

@@ -482,12 +482,45 @@ class _SongItemState extends State<SongItem> {
                 onPressed: () {
                   if (!isLocalFileExist) {
                     print("Push _loadFile");
+                    print(widget.musicUrl);
                     LocalstoreHelper.loadFile(widget.musicUrl, widget.title)
                         .then((value) => setState(() {
                               localFilePath = value;
                               isLocalFileExist = true;
                               print("Local - " + localFilePath);
                             }));
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => CupertinoAlertDialog(
+                        title: Text(widget.title),
+                        content: Text("Töröljük a mentett fájlt?"),
+                        actions: [
+                          CupertinoDialogAction(
+                            child: Text("Mégsem"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          CupertinoDialogAction(
+                            isDefaultAction: true,
+                            child: Text("Törlés"),
+                            onPressed: () {
+                              LocalstoreHelper.getLocalFile(widget.title).then((value){
+                                setState(() {
+                                  isLocalFileExist = false;
+                                  LocalstoreHelper.deleteFile(value);
+                                });
+                              });
+                              //plandesk.ItemCardFavorite;
+                              /*Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => MixList('Favorites')));*/
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
                   }
                 },
               ),

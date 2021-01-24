@@ -63,6 +63,19 @@ class Login extends StatelessWidget {
                             children: <Widget>[
                               Stack(
                                 children: <Widget>[
+                                  /*Container(
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage("assets/images/Gupmtn8B.jpg"), fit: BoxFit.cover)),
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                          colors: [blueColor.withOpacity(0.4), blueColor],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter),
+                                    ),
+                                  ),*/
                                   Container(
                                     height: 60.0,
                                     width: 60.0,
