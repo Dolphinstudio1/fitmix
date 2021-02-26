@@ -306,6 +306,15 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                 ),
                 Row(
                   children: <Widget>[
+                    ItemCardDownloaded('Downloaded', 'assets/images/favorites.png',
+                        'Downloaded'),
+                  ],
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+                Row(
+                  children: <Widget>[
                     ItemCard('Kangoo', 'assets/images/kangoo.jpg', 'Kangoo'),
                     SizedBox(
                       width: 16.0,
@@ -444,6 +453,72 @@ class ItemCardFavorite extends StatelessWidget {
   MixList mixList;
 
   ItemCardFavorite(this.groupName, this.image, this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    mixList = new MixList(groupName);
+    return Expanded(
+      flex: 1,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => mixList));
+            },
+            child: Container(
+              height: 60.0,
+              child: Stack(
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.asset(
+                      image,
+                      fit: BoxFit.cover,
+                      height: 140,
+                      width: double.infinity,
+                    ),
+                  ),
+                  Positioned(
+                    right: 16.0,
+                    top: 16.0,
+                    child: Icon(
+                      Icons.bookmark,
+                      color: Colors.white.withOpacity(0.6),
+                      size: 24.0,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 12.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 4.0),
+            child: Text(
+              title,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ItemCardDownloaded extends StatelessWidget {
+  final groupName;
+  final image;
+  final title;
+  MixList mixList;
+
+  ItemCardDownloaded(this.groupName, this.image, this.title);
 
   @override
   Widget build(BuildContext context) {

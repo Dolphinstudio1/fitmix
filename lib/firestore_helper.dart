@@ -1,4 +1,6 @@
 //import '../models/event_detail.dart';
+import 'package:fitmix/downloaded.dart';
+
 import 'favorite.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -27,5 +29,29 @@ class FirestoreHelper {
 
   static Future deleteFavorite(String favId) async {
     await db.collection('favorites').doc(favId).delete();
+  }
+
+  static Future addDownloaded(String mixId, String uid) {
+    Downloaded dow = Downloaded(null, mixId, uid);
+    var result = db
+        .collection('downloaded')
+        .add(dow.toMap())
+        .then((value) => print(value))
+        .catchError((error) => print(error));
+    return result;
+  }
+
+  static Future<List<Downloaded>> getUserDownloaded(String uid) async {
+    List<Downloaded> dow;
+    QuerySnapshot docs = await db.collection('downloaded')
+        .where('userId', isEqualTo: uid).get();
+    if (docs != null) {
+      dow = docs.docs.map((data)=> Downloaded.map(data)).toList();
+    }
+    return dow;
+  }
+
+  static Future deleteDownloaded(String dowId) async {
+    await db.collection('downloaded').doc(dowId).delete();
   }
 }

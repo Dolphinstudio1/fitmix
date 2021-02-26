@@ -126,9 +126,9 @@ class _DetailedScreen extends State<DetailedScreen> {
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          colors: [blueColor.withOpacity(0.4), blueColor],
+                          colors: [blueColor, blueColor.withOpacity(0)], //0.4
                           begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter),
+                          end: Alignment.center),
                     ),
                   ),
                   Padding(
@@ -191,22 +191,22 @@ class _DetailedScreen extends State<DetailedScreen> {
                           ],
                         ),
                         Spacer(),
-                        Text(
+                        /*Text(
                           title,
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 32.0),
-                        ),
+                        ),*/
                         SizedBox(
                           height: 6.0,
                         ),
-                        Text(
+                        /*Text(
                           artist,
                           style: TextStyle(
                               color: Colors.white.withOpacity(0.6),
                               fontSize: 18.0),
-                        ),
+                        ),*/
                         SizedBox(
                           height: 16.0,
                         ),

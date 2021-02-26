@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitmix/downloaded.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'mix_list_item.dart';
@@ -48,6 +49,7 @@ class _MixListState extends State<MixList> {
   }
 
   List<Favorite> favorites = [];
+  List<Downloaded> downloaded = [];
 
   //List<SongItem> favoriteMixes = [];
 
@@ -56,6 +58,7 @@ class _MixListState extends State<MixList> {
     // TODO: implement initState
     super.initState();
     getFavoriteList();
+    getDownloadedList();
     /*firestoreInstance
         .collection('mixes')
         .where('group_name', isEqualTo: groupName)
@@ -88,7 +91,22 @@ class _MixListState extends State<MixList> {
       setState(() {
         favorites = data;
         if (widget.groupName == "Favorites") {
-          fetchAllMixes(membersIDS: favorites).then((value) {
+          fetchAllFavoriteMixes(membersIDS: favorites).then((value) {
+            setState(() {
+              _mixListItems = value;
+            });
+          });
+        }
+      });
+    });
+  }
+
+  void getDownloadedList() {
+    FirestoreHelper.getUserDownloaded(Login.getUser().uid).then((data) {
+      setState(() {
+        downloaded = data;
+        if (widget.groupName == "Downloaded") {
+          fetchAllDownloadedMixes(membersIDS: downloaded).then((value) {
             setState(() {
               _mixListItems = value;
             });
@@ -108,7 +126,7 @@ class _MixListState extends State<MixList> {
   ];
 
   /// Fetch members list
-  Future<List<SongItem>> fetchAllMixes({List<Favorite> membersIDS}) async {
+  Future<List<SongItem>> fetchAllFavoriteMixes({List<Favorite> membersIDS}) async {
     /*/// With whereIn
     var result = await ref.where('uid', whereIn: membersIDS).get();
     print(result.docs);
@@ -129,8 +147,40 @@ class _MixListState extends State<MixList> {
             result.get("mix_url"),
             widget.groupName,
             favorites,
+            downloaded,
             //refreshCallback: () {getFavoriteList()}
-            clickCallback: getFavoriteList));
+            favoritesCallback: getFavoriteList, downloadedCallback: getDownloadedList));
+      });
+    }
+    //print(results);
+    return results;
+  }
+
+  /// Fetch members list
+  Future<List<SongItem>> fetchAllDownloadedMixes({List<Downloaded> membersIDS}) async {
+    /*/// With whereIn
+    var result = await ref.where('uid', whereIn: membersIDS).get();
+    print(result.docs);
+    //var documents = result.docs.map((doc) => User.fromMap(doc.data, doc.id)).toList();
+    //return documents;*/
+
+    /// With loop
+    List<SongItem> results = [];
+    for (Downloaded userID in membersIDS) {
+      print(userID.mixId);
+      await ref.doc(userID.mixId).get().then((result) {
+        //print(result.data());
+        results.add(SongItem(
+            result.id,
+            result.get("mix_name"),
+            'artist',
+            result.get("iamge_url"),
+            result.get("mix_url"),
+            widget.groupName,
+            favorites,
+            downloaded,
+            //refreshCallback: () {getFavoriteList()}
+            favoritesCallback: getFavoriteList, downloadedCallback: getDownloadedList));
       });
     }
     //print(results);
@@ -203,7 +253,7 @@ class _MixListState extends State<MixList> {
             ),
           ),
           Expanded(
-            child: (widget.groupName == 'Favorites')
+            child: (widget.groupName == 'Favorites' || widget.groupName == 'Downloaded')
                 ?
                 //print(favoriteMixes.length);
                 ListView.builder(
@@ -263,13 +313,13 @@ class _MixListState extends State<MixList> {
                               //DocumentSnapshot data = querySnapshot.data[index];
                               return SongItem(
                                   list[index].id,
-                                  list[index].get("mix_name").substring(0,
-                                      list[index].get("mix_name").length - 4),
+                                  list[index].get("mix_name"), //.substring(0, list[index].get("mix_name").length - 4)
                                   'artist',
                                   list[index].get("iamge_url"),
                                   list[index].get("mix_url"),
                                   widget.groupName,
-                                  favorites);
+                                  favorites,
+                                  downloaded);
                             },
                             itemCount: list.length,
                           ),
@@ -291,9 +341,11 @@ class SongItem extends StatefulWidget {
   final String musicUrl;
   final String groupName;
   List<Favorite> favorites;
+  List<Downloaded> downloaded;
 
   //final RefreshCallback refreshCallback;
-  final VoidCallback clickCallback;
+  final VoidCallback favoritesCallback;
+  final VoidCallback downloadedCallback;
 
   SongItem(
       this.mixId,
@@ -303,8 +355,9 @@ class SongItem extends StatefulWidget {
       this.musicUrl,
       this.groupName,
       this.favorites,
+      this.downloaded,
       //{this.refreshCallback}
-      {this.clickCallback});
+      {this.favoritesCallback,this.downloadedCallback});
 
   @override
   _SongItemState createState() => _SongItemState();
@@ -357,19 +410,46 @@ class _SongItemState extends State<SongItem> {
       print("Favorites - " + widget.favorites.toString());
     });
     //refreshCallback();
-    widget.clickCallback();
+    widget.favoritesCallback();
+  }
+
+  bool isUserDownloaded(String mixId) {
+    Downloaded downloaded = widget.downloaded
+        .firstWhere((Downloaded d) => (d.mixId == mixId), orElse: () => null);
+    if (downloaded == null)
+      return false;
+    else
+      return true;
+  }
+
+  toggleDownloaded(String mixId) async {
+    if (isUserDownloaded(mixId)) {
+      Downloaded downloaded =
+      widget.downloaded.firstWhere((Downloaded d) => (d.mixId == mixId));
+      String favId = downloaded.id;
+      await FirestoreHelper.deleteDownloaded(favId);
+    } else {
+      await FirestoreHelper.addDownloaded(mixId, Login.getUser().uid);
+    }
+    List<Downloaded> updatedDownloaded =
+    await FirestoreHelper.getUserDownloaded(Login.getUser().uid);
+    setState(() {
+      widget.downloaded = updatedDownloaded;
+      print("Downloaded - " + widget.downloaded.toString());
+    });
+    //refreshCallback();
+    widget.downloadedCallback();
   }
 
   @override
   Widget build(BuildContext context) {
-    Color starColor =
-        (isUserFavorite(widget.mixId) ? Colors.amber : Colors.grey);
+    //Color starColor = (isUserFavorite(widget.mixId) ? Colors.amber : Colors.grey);
     Icon starIcon = (isUserFavorite(widget.mixId)
         ? Icon(Icons.star_outlined)
         : Icon(Icons.star_border_outlined));
-    Icon arrowIcon = isLocalFileExist
+    Icon arrowIcon = isLocalFileExist //(isUserDownloaded(widget.mixId)
         ? Icon(Icons.download_rounded)
-        : Icon(Icons.download_outlined);
+        : Icon(Icons.download_outlined); //)
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
@@ -483,6 +563,7 @@ class _SongItemState extends State<SongItem> {
                   if (!isLocalFileExist) {
                     print("Push _loadFile");
                     print(widget.musicUrl);
+                    toggleDownloaded(widget.mixId);
                     LocalstoreHelper.loadFile(widget.musicUrl, widget.title)
                         .then((value) => setState(() {
                               localFilePath = value;
@@ -506,6 +587,7 @@ class _SongItemState extends State<SongItem> {
                             isDefaultAction: true,
                             child: Text("Törlés"),
                             onPressed: () {
+                              toggleDownloaded(widget.mixId);
                               LocalstoreHelper.getLocalFile(widget.title).then((value){
                                 setState(() {
                                   isLocalFileExist = false;

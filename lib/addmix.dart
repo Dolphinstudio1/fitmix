@@ -79,7 +79,7 @@ class _State extends State<AddMix> {
 
   Future _selectMusicFile() async {
     File file = await FilePicker.getFile(type: FileType.audio);
-    _musicFileName = path.basename(file.path);
+    _musicFileName = path.basenameWithoutExtension(file.path);
     print("musicFileName - " + _musicFileName);
 
     setState(() {
