@@ -1,4 +1,4 @@
-import 'package:fitmix/add_mix_to_database.dart';
+/*import 'package:fitmix/add_mix_to_database.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -269,4 +269,4 @@ class _State extends State<AddMix> {
               onPressed: selectContentsMethod)),
     );
   }
-}
+}*/

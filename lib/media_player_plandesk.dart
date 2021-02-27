@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitmix/addmix.dart';
+import 'package:fitmix/addmix_new.dart';
 import 'package:flutter/material.dart';
 import 'media_player_designed.dart';
 import 'mix_list.dart';
@@ -47,15 +48,17 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
         List value = element.data()["admins"];
         print(value);
         for (final i in value) {
-          if (i == Login.getUser().uid) {
-            setState(() {
-              adminUser = true;
-            });
-            print(adminUser);
-          } else {
-            setState(() {
-              adminUser = false;
-            });
+          if (adminUser == false) {
+            if (i == Login.getUser().uid) {
+              setState(() {
+                adminUser = true;
+              });
+              print(adminUser);
+            } else {
+              setState(() {
+                adminUser = false;
+              });
+            }
           }
         }
         /*Firestore.instance.collection("items").document(value[0]).get().then((value){
@@ -115,7 +118,8 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => AddMix()));
+                                  builder: (context) =>
+                                      TaskManager())); //AddMix
                         },
                       ),
                       new ListTile(
@@ -306,8 +310,8 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                 ),
                 Row(
                   children: <Widget>[
-                    ItemCardDownloaded('Downloaded', 'assets/images/favorites.png',
-                        'Downloaded'),
+                    ItemCardDownloaded('Downloaded',
+                        'assets/images/favorites.png', 'Downloaded'),
                   ],
                 ),
                 SizedBox(
