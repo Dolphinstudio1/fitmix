@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
+import 'google_sign_in_test.dart';
+
 class Login extends StatelessWidget {
   var blueColor = Color(0xFF090e42);
 
@@ -26,11 +28,11 @@ class Login extends StatelessWidget {
 
   Future<UserCredential> signInWithFacebook() async {
     // Trigger the sign-in flow
-    final AccessToken result = await FacebookAuth.instance.login();
+    final LoginResult result = await FacebookAuth.instance.login();
 
     // Create a credential from the access token
     final FacebookAuthCredential facebookAuthCredential =
-    FacebookAuthProvider.credential(result.token);
+    FacebookAuthProvider.credential(result.accessToken.token);
 
     // Once signed in, return the UserCredential
     return await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);

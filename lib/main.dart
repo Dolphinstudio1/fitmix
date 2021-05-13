@@ -125,6 +125,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (snapshot.connectionState == ConnectionState.active) {
                   User user = snapshot.data;
 
+                  FirebaseAuth.instance
+                      .authStateChanges()
+                      .listen((User user) {
+                    if (user == null) {
+                      print('User is currently signed out!');
+                    } else {
+                      print('User is signed in!');
+                    }
+                  });
+
+                  // Disable persistence on web platforms
+                  //await FirebaseAuth.instance.setPersistence(Persistence.NONE);
+
                   if (user == null) {
                     return Login();
                   } else {

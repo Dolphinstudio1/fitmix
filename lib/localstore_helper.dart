@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -43,10 +44,10 @@ class LocalstoreHelper {
     return file.path;
   }
 
-  static Future<Uint8List> _loadFileBytes(String url, {OnError onError}) async {
-    Uint8List bytes;
+  static Future<ByteData> _loadFileBytes(String url, {OnError onError}) async {
+    ByteData bytes;
     try {
-      bytes = await readBytes(url);
+      bytes = await rootBundle.load(url);
     } on ClientException {
       rethrow;
     }
@@ -64,7 +65,7 @@ class LocalstoreHelper {
     final file = File('${dir.path}/$title.mp3');
     print(file);
 
-    await file.writeAsBytes(bytes);
+    await file.writeAsBytes(bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
     return file.path;
   }
 

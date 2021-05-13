@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -49,11 +50,11 @@ class _MediaPlayerAppState extends State<MediaPlayerApp> {
   }
 
   Future _loadFile() async {
-    final bytes = await readBytes(musicUrl);
+    final bytes = await rootBundle.load(musicUrl);
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/audio.mp3');
 
-    await file.writeAsBytes(bytes);
+    await file.writeAsBytes(bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
     if (await file.exists()) {
       setState(() {
         localFilePath = file.path;
@@ -194,12 +195,12 @@ class _AdvancedState extends State<Advanced> {
 
   _AdvancedState(this.musicUrl);
 
-  @override
+  /*@override
   void initState() {
     widget.advancedPlayer.seekCompleteHandler =
         (finished) => setState(() => seekDone = finished);
     super.initState();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {

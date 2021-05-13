@@ -50,7 +50,7 @@ class AddMixDatabase extends StatelessWidget {
                 print(doc.exists);
                 print(doc.metadata);
                 print(doc.id);
-                print(doc.data().values);
+                //print(doc.data().values);
                 print(doc.get("image_name"));
               })
             });

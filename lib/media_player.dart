@@ -5,8 +5,11 @@ import 'dart:typed_data';
 import 'package:audioplayer/audioplayer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'package:flutter/services.dart' show rootBundle;
 
 typedef void OnError(Exception exception);
 
@@ -133,10 +136,10 @@ class _AudioAppState extends State<AudioApp> {
     setState(() => playerState = PlayerState.stopped);
   }
 
-  Future<Uint8List> _loadFileBytes(String url, {OnError onError}) async {
-    Uint8List bytes;
+  Future<ByteData> _loadFileBytes(String url, {OnError onError}) async {
+    ByteData bytes;
     try {
-      bytes = await readBytes(url);
+      bytes = await rootBundle.load(url);
     } on ClientException {
       rethrow;
     }
@@ -151,7 +154,7 @@ class _AudioAppState extends State<AudioApp> {
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/audio.mp3');
 
-    await file.writeAsBytes(bytes);
+    await file.writeAsBytes(bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
     if (await file.exists())
       setState(() {
         localFilePath = file.path;
