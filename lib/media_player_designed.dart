@@ -115,7 +115,7 @@ class _DetailedScreen extends State<DetailedScreen> {
       body: Column(
         children: <Widget>[
           Container(
-              height: 400.0,
+              height: 382.0,
               child: Stack(
                 children: <Widget>[
                   Container(

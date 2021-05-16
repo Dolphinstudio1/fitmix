@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitmix/addmix.dart';
 import 'package:fitmix/addmix_new.dart';
 import 'package:flutter/material.dart';
+import 'file_picker_demo.dart';
 import 'media_player_designed.dart';
 import 'mix_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -119,7 +120,7 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      TaskManager())); //AddMix
+                                      TaskManager())); //AddMix FilePickerDemo
                         },
                       ),
                       new ListTile(
@@ -352,14 +353,14 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                 SizedBox(
                   height: 16.0,
                 ),
-                SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
+                SongItem('Ine the name of l', 'Martin Garrix', martinGarrix,
                     widget.musicUrl),
                 SongItem('Never be like you', 'Flume', flume, widget.musicUrl),
                 SongItem(
                     'Worry bout us', 'Rosie Lowe', rosieLowe, widget.musicUrl),
-                SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
+                SongItem('Ine the name of l', 'Martin Garrix', martinGarrix,
                     widget.musicUrl),
-                SongItem('Ine the name of love', 'Martin Garrix', martinGarrix,
+                SongItem('Ine the name of l', 'Martin Garrix', martinGarrix,
                     widget.musicUrl),
               ],
             ),

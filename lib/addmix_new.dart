@@ -73,7 +73,7 @@ class _TaskManager extends State<TaskManager> {
     firebase_storage.Reference refAudio;
 
     if (path.extension(file.path) == '.jpg' ||
-        path.extension(file.path) == '.png') {
+        path.extension(file.path) == '.jpeg') {
       // Create a Reference to the file
       refImage = firebase_storage.FirebaseStorage.instance
           .ref()
@@ -92,7 +92,25 @@ class _TaskManager extends State<TaskManager> {
       } else {
         uploadTask = refImage.putFile(io.File(file.path), metadataImage);
       }
-    } else {
+    } else if (path.extension(file.path) == '.png') {
+      refImage = firebase_storage.FirebaseStorage.instance
+          .ref()
+          //.child('playground')
+          .child('/' +
+              path.basenameWithoutExtension(_imageFile.files.single.path) +
+              '.png');
+
+      final metadataImage = firebase_storage.SettableMetadata(
+          contentType: 'image/jpeg',
+          customMetadata: {'picked-file-path': file.path});
+      print('Image file path ' + file.path);
+
+      if (kIsWeb) {
+        uploadTask = refImage.putData(await file.readAsBytes(), metadataImage);
+      } else {
+        uploadTask = refImage.putFile(io.File(file.path), metadataImage);
+      }
+    } else if (path.extension(file.path) == '.mp3') {
       refAudio = firebase_storage.FirebaseStorage.instance
           .ref()
           //.child('playground')
@@ -189,7 +207,7 @@ class _TaskManager extends State<TaskManager> {
   }
 
   Future _selectMusicFile() async {
-    _mixFile = await FilePicker.platform.pickFiles(type: FileType.audio);
+    _mixFile = await FilePicker.platform.pickFiles(type: FileType.any);
     print('_mixFile ' + _mixFile.toString());
     _mixTask = await uploadFile(File(_mixFile.files.single.path));
     print(_mixTask);
@@ -272,9 +290,9 @@ class _TaskManager extends State<TaskManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Storage Example App'),
-          actions: [
+      appBar: AppBar(
+        title: Text('Storage Example App'),
+        /*actions: [
             PopupMenuButton<UploadType>(
                 onSelected: handleUploadType,
                 icon: Icon(Icons.add),
@@ -289,83 +307,84 @@ class _TaskManager extends State<TaskManager> {
                         PopupMenuItem(
                             child: Text("Clear list"), value: UploadType.clear)
                     ])
-          ],
-        ),
-        body: _uploadTasks.isEmpty
-            ? //Center(child: Text("Press the '+' button to add a new file."))
-            Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  if (true)
-                    Container(
-                      alignment: Alignment.center,
-                      child: new DropdownButton<int>(
-                        value: _value,
-                        items: <int>[0, 1, 2, 3].map((int value) {
-                          return new DropdownMenuItem<int>(
-                            value: value,
-                            child: new Text(elements[value]),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _value = value;
-                            groupName = elements[value];
-                          });
-                        },
-                      ),
+          ],*/
+      ),
+      body: _uploadTasks.isEmpty
+          ? //Center(child: Text("Press the '+' button to add a new file."))
+          Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                if (true)
+                  Container(
+                    alignment: Alignment.center,
+                    child: new DropdownButton<int>(
+                      value: _value,
+                      items: <int>[0, 1, 2, 3].map((int value) {
+                        return new DropdownMenuItem<int>(
+                          value: value,
+                          child: new Text(elements[value]),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _value = value;
+                          groupName = elements[value];
+                        });
+                      },
                     ),
-                  if (_selectedImage != null)
-                    Image.file(_selectedImage, height: 300.0, width: 300.0),
-                  if (_imageTask == null)
-                    ElevatedButton(
-                        child: Text('Choose a cover image'),
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.pink,
-                            textStyle: TextStyle(color: Colors.white)),
-                        onPressed: _selectImageFile),
-                  if (_mixTask == null)
-                    ElevatedButton(
-                        child: Text('Choose a music file'),
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.pink,
-                            textStyle: TextStyle(color: Colors.white)),
-                        onPressed: _selectMusicFile),
-                  if (_selectedImage != null && _selectedMix != null)
-                    ElevatedButton(
-                      child: Text('Upload'),
+                  ),
+                if (_selectedImage != null)
+                  Image.file(_selectedImage, height: 300.0, width: 300.0),
+                if (_imageTask == null)
+                  ElevatedButton(
+                      child: Text('Choose a cover image'),
                       style: ElevatedButton.styleFrom(
                           primary: Colors.pink,
                           textStyle: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        addMix();
-                        handleUploadType(UploadType.file);
-                      },
-                    ),
-                ],
-              )
-            : ListView.builder(
-                itemCount: _uploadTasks.length,
-                itemBuilder: (context, index) => UploadTaskListTile(
-                    task: _uploadTasks[index],
-                    onDismissed: () => _removeTaskAtIndex(index),
-                    onDownloadLink: () {
-                      return _downloadLink(_uploadTasks[index].snapshot.ref);
+                      onPressed: _selectImageFile),
+                if (_mixTask == null)
+                  ElevatedButton(
+                      child: Text('Choose a music file'),
+                      style: ElevatedButton.styleFrom(
+                          primary: Colors.pink,
+                          textStyle: TextStyle(color: Colors.white)),
+                      onPressed: _selectMusicFile),
+                if (_selectedImage != null && _selectedMix != null)
+                  ElevatedButton(
+                    child: Text('Upload'),
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.pink,
+                        textStyle: TextStyle(color: Colors.white)),
+                    onPressed: () {
+                      addMix();
+                      handleUploadType(UploadType.file);
                     },
-                    onDownload: () {
-                      if (kIsWeb) {
-                        return _downloadBytes(_uploadTasks[index].snapshot.ref);
-                      } else {
-                        return _downloadFile(_uploadTasks[index].snapshot.ref);
-                      }
-                    })),
-        /*floatingActionButton: Visibility(
+                  ),
+              ],
+            )
+          : ListView.builder(
+              itemCount: _uploadTasks.length,
+              itemBuilder: (context, index) => UploadTaskListTile(
+                  task: _uploadTasks[index],
+                  onDismissed: () => _removeTaskAtIndex(index),
+                  onDownloadLink: () {
+                    return _downloadLink(_uploadTasks[index].snapshot.ref);
+                  },
+                  onDownload: () {
+                    if (kIsWeb) {
+                      return _downloadBytes(_uploadTasks[index].snapshot.ref);
+                    } else {
+                      return _downloadFile(_uploadTasks[index].snapshot.ref);
+                    }
+                  })),
+      /*floatingActionButton: Visibility(
             visible: _floatingActionButtonShow,
             child: FloatingActionButton(
                 tooltip: 'Upload',
                 child: Icon(Icons.add),
-                onPressed: _selectImageFile))*/);
+                onPressed: _selectImageFile))*/
+    );
   }
 }
 
