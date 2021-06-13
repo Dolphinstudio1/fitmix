@@ -141,6 +141,7 @@ class _MixListState extends State<MixList> {
         //print(result.data());
         results.add(SongItem(
             result.id,
+            result.get("bmp_value"),
             result.get("mix_name"),
             'artist',
             result.get("iamge_url"),
@@ -172,6 +173,7 @@ class _MixListState extends State<MixList> {
         //print(result.data());
         results.add(SongItem(
             result.id,
+            result.get("bmp_value"),
             result.get("mix_name"),
             'artist',
             result.get("iamge_url"),
@@ -313,6 +315,7 @@ class _MixListState extends State<MixList> {
                               //DocumentSnapshot data = querySnapshot.data[index];
                               return SongItem(
                                   list[index].id,
+                                  list[index].get("bpm_value"),
                                   list[index].get("mix_name"), //.substring(0, list[index].get("mix_name").length - 4)
                                   'artist',
                                   list[index].get("iamge_url"),
@@ -335,6 +338,7 @@ class _MixListState extends State<MixList> {
 
 class SongItem extends StatefulWidget {
   final String mixId;
+  final int bpm;
   final String title;
   final String artist;
   final String image;
@@ -349,6 +353,7 @@ class SongItem extends StatefulWidget {
 
   SongItem(
       this.mixId,
+      this.bpm,
       this.title,
       this.artist,
       this.image,
@@ -460,7 +465,7 @@ class _SongItemState extends State<SongItem> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DetailedScreen(widget.musicUrl,
+                      builder: (context) => DetailedScreen(widget.bpm, widget.musicUrl,
                           widget.title, widget.artist, widget.image)));
             },
             child: Stack(

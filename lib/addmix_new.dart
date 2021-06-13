@@ -49,11 +49,22 @@ class _TaskManager extends State<TaskManager> {
   bool selectContantsFlag = false;
 
   int _value = 0;
+  int _valueBpm = 0;
   String groupName;
+  String bpmValue;
   String imageUrl;
   String musicUrl;
 
   set metadataImage(SettableMetadata metadataImage) {}
+
+  List<String> elements = ['Fit', 'Djs', 'Instructors', 'Royalityfree']; //Kangoo Aerobic Box Yoga
+  List<String> bpms = [];
+
+  _TaskManager(){
+    for(var i = 110; i <= 150; i++) {
+      bpms.add(i.toString());
+    }
+  }
 
   /// The user selects a file, and the task is added to the list.
   Future<firebase_storage.UploadTask> uploadFile(File file) async {
@@ -231,6 +242,7 @@ class _TaskManager extends State<TaskManager> {
     return mixes
         .add({
           'group_name': groupName,
+          'bpm_value': int.parse(bpmValue),
           'image_name': path
               .basenameWithoutExtension(_imageFile.files.single.path)
               .toString(), // John Doe
@@ -285,8 +297,6 @@ class _TaskManager extends State<TaskManager> {
     )));
   }
 
-  List<String> elements = ['Kangoo', 'Aerobic', 'Box', 'Yoga'];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -334,6 +344,26 @@ class _TaskManager extends State<TaskManager> {
                       },
                     ),
                   ),
+                Container(
+                  alignment: Alignment.center,
+                  child: new DropdownButton<int>(
+                    value: _valueBpm,
+                    items: <int>[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                      16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                      32, 33, 34, 35, 36, 37, 38, 39, 40].map((int value) {
+                      return new DropdownMenuItem<int>(
+                        value: value,
+                        child: new Text(bpms[value]),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _valueBpm = value;
+                        bpmValue = bpms[value];
+                      });
+                    },
+                  ),
+                ),
                 if (_selectedImage != null)
                   Image.file(_selectedImage, height: 300.0, width: 300.0),
                 if (_imageTask == null)

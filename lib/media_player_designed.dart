@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
@@ -9,16 +10,17 @@ enum PlayerState { stopped, playing, paused }
 enum PlayingRouteState { speakers, earpiece }
 
 class DetailedScreen extends StatefulWidget {
+  final bpm;
   final String url;
   final title;
   final artist;
   final image;
 
-  DetailedScreen(this.url, this.title, this.artist, this.image);
+  DetailedScreen(this.bpm, this.url, this.title, this.artist, this.image);
 
   @override
   State<StatefulWidget> createState() {
-    return _DetailedScreen(url, title, artist, image);
+    return _DetailedScreen(bpm, url, title, artist, image);
   }
 }
 
@@ -26,11 +28,14 @@ class _DetailedScreen extends State<DetailedScreen> {
   var blueColor = Color(0xFF090e42);
   var pinkColor = Color(0xFFff6b80);
 
+  final bpm;
   String url;
   PlayerMode mode = PlayerMode.MEDIA_PLAYER;
   final title;
   final artist;
   final image;
+
+  int currentBpm; //126
 
   AudioPlayer _audioPlayer;
 
@@ -50,11 +55,9 @@ class _DetailedScreen extends State<DetailedScreen> {
   StreamSubscription _playerStateSubscription;
   StreamSubscription<PlayerControlCommand> _playerControlCommandSubscription;
 
-  int defaultBpm = 126;
-  int bpm = 126;
   double playbackRate = 1.0;
 
-  _DetailedScreen(this.url, this.title, this.artist, this.image);
+  _DetailedScreen(this.bpm, this.url, this.title, this.artist, this.image);
 
   get _isPlaying => _playerState == PlayerState.playing;
 
@@ -75,6 +78,7 @@ class _DetailedScreen extends State<DetailedScreen> {
     super.initState();
     _initAudioPlayer();
     selectPlayMethod();
+    currentBpm = bpm;
   }
 
   void selectPlayMethod() {
@@ -306,7 +310,7 @@ class _DetailedScreen extends State<DetailedScreen> {
                   child: Padding(
                 padding: const EdgeInsets.all(0.0),
                 child: Text(
-                  bpm.toString(),
+                  currentBpm.toString(),
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -469,17 +473,23 @@ class _DetailedScreen extends State<DetailedScreen> {
   }
 
   void _bpmCalculator(String setBpmSignal) {
+
     setState(() {
       if (setBpmSignal == '+') {
-        bpm++;
+        currentBpm++;
       } else if (setBpmSignal == '-') {
-        bpm--;
+        currentBpm--;
       }
 
-      playbackRate = bpm / defaultBpm;
+      playbackRate = currentBpm / bpm;
       print(playbackRate.toString());
       _audioPlayer.setPlaybackRate(playbackRate: playbackRate);
     });
+  }
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IntProperty('bpm', currentBpm));
   }
 }
 

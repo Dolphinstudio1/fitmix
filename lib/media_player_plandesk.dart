@@ -320,12 +320,12 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                 ),
                 Row(
                   children: <Widget>[
-                    ItemCard('Kangoo', 'assets/images/kangoo.jpg', 'Kangoo'),
+                    ItemCard('Fit', 'assets/images/fitmixes.jpeg', 'Fit Mixes'), //Kangoo Kangoo kangoo
                     SizedBox(
                       width: 16.0,
                     ),
                     ItemCard(
-                        'Aerobic', 'assets/images/aerobic.jpeg', 'Aerobic'),
+                        'Djs', 'assets/images/djs.jpeg', 'Djs Mixes'), // Aerobic aerobic Aerobic
                   ],
                 ),
                 SizedBox(
@@ -333,11 +333,11 @@ class _MediaPlayerPlanState extends State<MediaPlayerPlan> {
                 ),
                 Row(
                   children: <Widget>[
-                    ItemCard('Box', 'assets/images/box.jpeg', 'Box'),
+                    ItemCard('Instructors' , 'assets/images/instructors.jpeg', 'Instructor\'s Mixes'), //Box box Box
                     SizedBox(
                       width: 16.0,
                     ),
-                    ItemCard('Yoga', 'assets/images/yoga.jpeg', 'Yoga'),
+                    ItemCard('Royalityfree', 'assets/images/royalityfree.jpeg', 'Royality Mixes'), //Yoga yoga Yoga
                   ],
                 ),
                 SizedBox(
@@ -385,7 +385,7 @@ class SongItem extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    DetailedScreen(musicUrl, title, artist, image)));
+                    DetailedScreen("126", musicUrl, title, artist, image)));
       },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 26.0),
